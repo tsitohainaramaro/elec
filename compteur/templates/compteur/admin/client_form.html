@@ -1,0 +1,506 @@
+{% extends "compteur/base.html" %}
+
+{% block title %}
+    {{ titre }} - Gestion Électricité
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4 py-6">
+
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
+                {{ titre }}
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+                Gestion des informations du client
+            </p>
+        </div>
+
+        <a
+            href="{% url 'compteur:clients_admin' %}"
+            class="inline-flex items-center justify-center gap-2
+                   px-4 py-2.5 rounded-xl
+                   bg-gray-100 hover:bg-gray-200
+                   text-gray-700 font-medium transition"
+        >
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            Retour aux clients
+        </a>
+
+    </div>
+
+
+    <!-- ERREURS GÉNÉRALES -->
+
+    {% if form.non_field_errors %}
+        <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+
+
+    <!-- FORMULAIRE -->
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        class="space-y-6"
+    >
+
+        {% csrf_token %}
+
+
+        <!-- COMPTE -->
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+
+            <div class="flex items-center gap-3 mb-6">
+
+                <div class="w-10 h-10 rounded-xl bg-blue-100
+                            flex items-center justify-center">
+
+                    <i
+                        data-lucide="user-cog"
+                        class="w-5 h-5 text-blue-600"
+                    ></i>
+
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Compte utilisateur
+                    </h2>
+
+                    <p class="text-sm text-gray-500">
+                        Informations de connexion
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <!-- USERNAME -->
+
+                <div>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Nom d'utilisateur
+                    </label>
+
+                    {{ form.username }}
+
+                    {% if form.username.errors %}
+                        <p class="text-sm text-red-600 mt-1">
+                            {{ form.username.errors.0 }}
+                        </p>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                    </label>
+
+                    {{ form.email }}
+
+                    {% if form.email.errors %}
+                        <p class="text-sm text-red-600 mt-1">
+                            {{ form.email.errors.0 }}
+                        </p>
+                    {% endif %}
+
+                </div>
+
+
+                {% if mode == "creation" %}
+
+                    <!-- PASSWORD -->
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Mot de passe
+                        </label>
+
+                        {{ form.password1 }}
+
+                        {% if form.password1.errors %}
+                            <p class="text-sm text-red-600 mt-1">
+                                {{ form.password1.errors.0 }}
+                            </p>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- PASSWORD CONFIRM -->
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Confirmation du mot de passe
+                        </label>
+
+                        {{ form.password2 }}
+
+                        {% if form.password2.errors %}
+                            <p class="text-sm text-red-600 mt-1">
+                                {{ form.password2.errors.0 }}
+                            </p>
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMATIONS PERSONNELLES -->
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+
+            <div class="flex items-center gap-3 mb-6">
+
+                <div class="w-10 h-10 rounded-xl bg-green-100
+                            flex items-center justify-center">
+
+                    <i
+                        data-lucide="user"
+                        class="w-5 h-5 text-green-600"
+                    ></i>
+
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Informations personnelles
+                    </h2>
+
+                    <p class="text-sm text-gray-500">
+                        Identité et coordonnées
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <!-- NOM -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Nom
+                    </label>
+
+                    {{ form.nom }}
+
+                    {% if form.nom.errors %}
+                        <p class="text-sm text-red-600 mt-1">
+                            {{ form.nom.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- PRENOM -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Prénom
+                    </label>
+
+                    {{ form.prenom }}
+
+                    {% if form.prenom.errors %}
+                        <p class="text-sm text-red-600 mt-1">
+                            {{ form.prenom.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+
+                <!-- TELEPHONE -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Téléphone
+                    </label>
+
+                    {{ form.telephone }}
+                </div>
+
+
+                <!-- DATE NAISSANCE -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Date de naissance
+                    </label>
+
+                    {{ form.date_naissance }}
+                </div>
+
+
+                <!-- PROFESSION -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Profession
+                    </label>
+
+                    {{ form.profession }}
+                </div>
+
+
+                <!-- CIN -->
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        CIN
+                    </label>
+
+                    {{ form.cin }}
+
+                    {% if form.cin.errors %}
+                        <p class="text-sm text-red-600 mt-1">
+                            {{ form.cin.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ADRESSE -->
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+
+            <div class="flex items-center gap-3 mb-6">
+
+                <div class="w-10 h-10 rounded-xl bg-orange-100
+                            flex items-center justify-center">
+
+                    <i
+                        data-lucide="map-pin"
+                        class="w-5 h-5 text-orange-600"
+                    ></i>
+
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Adresse
+                    </h2>
+
+                    <p class="text-sm text-gray-500">
+                        Localisation du client
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="space-y-5">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Adresse
+                    </label>
+
+                    {{ form.adresse }}
+                </div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Ville
+                        </label>
+
+                        {{ form.ville }}
+                    </div>
+
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Fokontany
+                        </label>
+
+                        {{ form.fokontany }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PHOTOS -->
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+
+            <div class="flex items-center gap-3 mb-6">
+
+                <div class="w-10 h-10 rounded-xl bg-purple-100
+                            flex items-center justify-center">
+
+                    <i
+                        data-lucide="camera"
+                        class="w-5 h-5 text-purple-600"
+                    ></i>
+
+                </div>
+
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-900">
+                        Documents et photos
+                    </h2>
+
+                    <p class="text-sm text-gray-500">
+                        Photos du client et de la CIN
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Photo du client
+                    </label>
+
+                    {{ form.photo_user }}
+                </div>
+
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        CIN recto
+                    </label>
+
+                    {{ form.photo_cin_recto }}
+                </div>
+
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        CIN verso
+                    </label>
+
+                    {{ form.photo_cin_verso }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STATUT -->
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+
+            <div class="flex items-center justify-between gap-4">
+
+                <div>
+
+                    <h2 class="font-semibold text-gray-900">
+                        Statut du client
+                    </h2>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Un client désactivé ne pourra pas être considéré comme actif.
+                    </p>
+
+                </div>
+
+                <label class="inline-flex items-center gap-3 cursor-pointer">
+
+                    {{ form.actif }}
+
+                    <span class="text-sm font-medium text-gray-700">
+                        Client actif
+                    </span>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOUTONS -->
+
+        <div class="flex flex-col sm:flex-row justify-end gap-3">
+
+            <a
+                href="{% url 'compteur:clients_admin' %}"
+                class="px-5 py-3 rounded-xl
+                       bg-gray-100 hover:bg-gray-200
+                       text-gray-700 font-medium
+                       text-center transition"
+            >
+                Annuler
+            </a>
+
+
+            <button
+                type="submit"
+                class="inline-flex items-center justify-center gap-2
+                       px-6 py-3 rounded-xl
+                       bg-blue-600 hover:bg-blue-700
+                       text-white font-semibold
+                       transition"
+            >
+
+                <i
+                    data-lucide="save"
+                    class="w-5 h-5"
+                ></i>
+
+                {% if mode == "creation" %}
+                    Créer le client
+                {% else %}
+                    Enregistrer les modifications
+                {% endif %}
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+</script>
+
+{% endblock %}

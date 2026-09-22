@@ -1,0 +1,570 @@
+
+{% extends "compteur/base.html" %}
+
+{% block title %}
+Dashboard Client
+{% endblock %}
+
+
+{% block content %}
+
+<div
+    class="max-w-7xl mx-auto"
+    id="dashboardClient"
+>
+
+
+    <!-- ========================================================= -->
+    <!-- TITRE -->
+    <!-- ========================================================= -->
+
+    <div class="mb-6">
+
+        <h1 class="text-2xl md:text-3xl font-bold">
+
+            Bonjour
+
+            {% if profil %}
+                {{ profil.prenom }}
+            {% else %}
+                {{ request.user.username }}
+            {% endif %}
+
+            👋
+
+        </h1>
+
+        <p class="text-slate-500 mt-1">
+            Voici l'état de vos compteurs électriques.
+        </p>
+
+        <p
+            class="text-xs text-slate-400 mt-2"
+            id="tempsReelStatut"
+        >
+            ● Actualisation automatique...
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- STATISTIQUES -->
+    <!-- ========================================================= -->
+
+    <div
+        class="grid grid-cols-1 sm:grid-cols-2
+               lg:grid-cols-4 gap-4 mb-6"
+    >
+
+
+        <!-- COMPTEURS -->
+
+        <div
+            class="dashboard-card bg-white rounded-2xl p-5 shadow-sm"
+        >
+
+            <div class="flex justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        Compteurs
+                    </p>
+
+                    <p
+                        id="nombreCompteurs"
+                        class="text-3xl font-bold mt-2"
+                    >
+                        {{ nombre_compteurs }}
+                    </p>
+
+                </div>
+
+                <div class="bg-blue-100 text-blue-600 p-3 rounded-xl">
+                    ⚡
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ESP32 -->
+
+        <div
+            class="dashboard-card bg-white rounded-2xl p-5 shadow-sm"
+        >
+
+            <div class="flex justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        ESP32 connectés
+                    </p>
+
+                    <p
+                        id="compteursConnectes"
+                        class="text-3xl font-bold mt-2"
+                    >
+                        {{ compteurs_connectes }}
+                    </p>
+
+                </div>
+
+                <div class="bg-green-100 text-green-600 p-3 rounded-xl">
+                    ✓
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SOLDE -->
+
+        <div
+            class="dashboard-card bg-white rounded-2xl p-5 shadow-sm"
+        >
+
+            <p class="text-sm text-slate-500">
+                Solde énergie
+            </p>
+
+            <p class="text-3xl font-bold mt-2">
+
+                <span id="soldeTotal">
+                    {{ solde_total }}
+                </span>
+
+                <span class="text-sm font-normal">
+                    kWh
+                </span>
+
+            </p>
+
+        </div>
+
+
+        <!-- CONSOMMATION -->
+
+        <div
+            class="dashboard-card bg-white rounded-2xl p-5 shadow-sm"
+        >
+
+            <p class="text-sm text-slate-500">
+                Consommation totale
+            </p>
+
+            <p class="text-3xl font-bold mt-2">
+
+                <span id="consommationTotale">
+                    {{ consommation_totale }}
+                </span>
+
+                <span class="text-sm font-normal">
+                    kWh
+                </span>
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MESURE -->
+    <!-- ========================================================= -->
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+        <div
+            class="lg:col-span-2
+                   bg-white rounded-2xl shadow-sm p-6"
+        >
+
+            <div class="flex justify-between mb-6">
+
+                <div>
+
+                    <h2 class="text-lg font-bold">
+                        Dernière mesure
+                    </h2>
+
+                    <p class="text-sm text-slate-500">
+                        Données PZEM en temps réel
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if derniere_mesure %}
+
+                <div
+                    class="grid grid-cols-2
+                           md:grid-cols-4 gap-4"
+                >
+
+
+                    <!-- TENSION -->
+
+                    <div class="bg-slate-50 rounded-xl p-4">
+
+                        <p class="text-sm text-slate-500">
+                            Tension
+                        </p>
+
+                        <p class="text-2xl font-bold">
+
+                            <span id="tensionTempsReel">
+                                {{ derniere_mesure.tension }}
+                            </span>
+
+                            V
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- COURANT -->
+
+                    <div class="bg-slate-50 rounded-xl p-4">
+
+                        <p class="text-sm text-slate-500">
+                            Courant
+                        </p>
+
+                        <p class="text-2xl font-bold">
+
+                            <span id="courantTempsReel">
+                                {{ derniere_mesure.courant }}
+                            </span>
+
+                            A
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- PUISSANCE -->
+
+                    <div class="bg-slate-50 rounded-xl p-4">
+
+                        <p class="text-sm text-slate-500">
+                            Puissance
+                        </p>
+
+                        <p class="text-2xl font-bold">
+
+                            <span id="puissanceTempsReel">
+                                {{ derniere_mesure.puissance }}
+                            </span>
+
+                            W
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- ENERGIE -->
+
+                    <div class="bg-slate-50 rounded-xl p-4">
+
+                        <p class="text-sm text-slate-500">
+                            Énergie
+                        </p>
+
+                        <p class="text-2xl font-bold">
+
+                            <span id="energieTempsReel">
+                                {{ derniere_mesure.energie }}
+                            </span>
+
+                            kWh
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DATE DERNIERE MESURE -->
+
+                <div
+                    class="mt-5 text-xs text-slate-400"
+                    id="dateMesureTempsReel"
+                >
+                    Dernière mesure :
+                    {{ derniere_mesure.date_mesure }}
+                </div>
+
+
+            {% else %}
+
+                <div
+                    class="text-center py-12
+                           text-slate-500"
+                >
+
+                    Aucune mesure disponible.
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ===================================================== -->
+        <!-- SOLDE -->
+        <!-- ===================================================== -->
+
+        <div
+            class="bg-white rounded-2xl
+                   shadow-sm p-6
+                   flex flex-col items-center justify-center"
+        >
+
+            <h2 class="font-bold text-lg mb-5">
+                Solde énergie
+            </h2>
+
+
+            <div class="energy-gauge">
+
+                <div class="energy-gauge-content">
+
+                    <p
+                        id="soldeGauge"
+                        class="text-3xl font-bold"
+                    >
+                        {{ solde_total }}
+                    </p>
+
+                    <p class="text-sm text-slate-500">
+                        kWh
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- COMPTEURS -->
+    <!-- ========================================================= -->
+
+    <div class="mt-6">
+
+        <h2 class="text-xl font-bold mb-4">
+            Mes compteurs
+        </h2>
+
+
+        <div
+            class="grid grid-cols-1
+                   md:grid-cols-2
+                   xl:grid-cols-3 gap-4"
+            id="listeCompteursTempsReel"
+        >
+
+
+            {% for item in compteurs %}
+
+                <div
+                    class="dashboard-card bg-white
+                           rounded-2xl shadow-sm p-5
+                           compteur-card-temps-reel"
+                    data-device-id="{{ item.compteur.device_id }}"
+                >
+
+
+                    <div class="flex justify-between">
+
+                        <div>
+
+                            <h3 class="font-bold">
+                                {{ item.compteur.nom }}
+                            </h3>
+
+                            <p class="text-xs text-slate-500">
+                                {{ item.compteur.device_id }}
+                            </p>
+
+                        </div>
+
+
+                        {% if item.compteur.esp32_connecte %}
+
+                            <span
+                                class="statut-esp32
+                                       text-green-600
+                                       bg-green-50
+                                       px-2 py-1 rounded-full
+                                       text-xs"
+                            >
+                                ● Connecté
+                            </span>
+
+                        {% else %}
+
+                            <span
+                                class="statut-esp32
+                                       text-red-600
+                                       bg-red-50
+                                       px-2 py-1 rounded-full
+                                       text-xs"
+                            >
+                                ● Déconnecté
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="grid grid-cols-2 gap-3 mt-5">
+
+
+                        <!-- SOLDE -->
+
+                        <div class="bg-slate-50 p-3 rounded-lg">
+
+                            <p class="text-xs text-slate-500">
+                                Solde
+                            </p>
+
+                            <p class="font-bold">
+
+                                <span class="compteur-solde">
+                                    {{ item.compteur.solde }}
+                                </span>
+
+                                kWh
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- CONTACTEUR -->
+
+                        <div class="bg-slate-50 p-3 rounded-lg">
+
+                            <p class="text-xs text-slate-500">
+                                Contacteur
+                            </p>
+
+                            <p
+                                class="font-bold compteur-contacteur"
+                            >
+
+                                {% if item.compteur.contacteur %}
+                                    ON
+                                {% else %}
+                                    OFF
+                                {% endif %}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="grid grid-cols-2 gap-3 mt-3"
+                    >
+
+
+                        <!-- PUISSANCE -->
+
+                        <div class="bg-slate-50 p-3 rounded-lg">
+
+                            <p class="text-xs text-slate-500">
+                                Puissance
+                            </p>
+
+                            <p class="font-bold">
+
+                                <span class="compteur-puissance">
+                                    0
+                                </span>
+
+                                W
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- ENERGIE -->
+
+                        <div class="bg-slate-50 p-3 rounded-lg">
+
+                            <p class="text-xs text-slate-500">
+                                Énergie
+                            </p>
+
+                            <p class="font-bold">
+
+                                <span class="compteur-energie">
+                                    0
+                                </span>
+
+                                kWh
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'compteur:compteur_detail' item.compteur.id %}"
+                        class="block text-center
+                               mt-4 bg-slate-900
+                               text-white rounded-lg
+                               py-2 hover:bg-slate-700"
+                    >
+                        Voir détails
+                    </a>
+
+                </div>
+
+            {% empty %}
+
+                <div
+                    class="bg-white rounded-2xl p-8
+                           text-center text-slate-500
+                           md:col-span-2
+                           xl:col-span-3"
+                >
+                    Aucun compteur associé à votre compte.
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}
+

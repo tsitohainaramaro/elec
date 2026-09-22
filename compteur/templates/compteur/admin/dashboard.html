@@ -1,0 +1,342 @@
+{% extends "compteur/base.html" %}
+
+{% block title %}
+Dashboard Administrateur
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto">
+
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">
+            Dashboard Administrateur
+        </h1>
+
+        <p class="text-slate-500 mt-1">
+            Supervision des clients et des compteurs.
+        </p>
+    </div>
+
+
+    <!-- STATISTIQUES -->
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <p class="text-slate-500 text-sm">
+                Clients
+            </p>
+
+            <p class="text-3xl font-bold mt-2">
+                {{ nombre_clients }}
+            </p>
+        </div>
+
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <p class="text-slate-500 text-sm">
+                Compteurs
+            </p>
+
+            <p class="text-3xl font-bold mt-2">
+                {{ nombre_compteurs }}
+            </p>
+        </div>
+
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <p class="text-slate-500 text-sm">
+                ESP32 connectés
+            </p>
+
+            <p class="text-3xl font-bold mt-2 text-green-600">
+                {{ compteurs_connectes }}
+            </p>
+        </div>
+
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <p class="text-slate-500 text-sm">
+                Compteurs coupés
+            </p>
+
+            <p class="text-3xl font-bold mt-2 text-red-600">
+                {{ compteurs_coupes }}
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- BILAN -->
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+
+            <p class="text-slate-500">
+                Solde total
+            </p>
+
+            <p class="text-4xl font-bold mt-2">
+                {{ solde_total }}
+                <span class="text-lg font-normal">
+                    kWh
+                </span>
+            </p>
+
+        </div>
+
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+
+            <p class="text-slate-500">
+                Consommation totale
+            </p>
+
+            <p class="text-4xl font-bold mt-2">
+                {{ consommation_totale }}
+                <span class="text-lg font-normal">
+                    kWh
+                </span>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- COMPTEURS -->
+
+    <div class="bg-white rounded-2xl shadow-sm mt-6 overflow-hidden">
+
+        <div class="p-6 border-b">
+
+            <h2 class="text-xl font-bold">
+                Derniers compteurs
+            </h2>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full">
+
+                <thead class="bg-slate-50">
+
+                    <tr>
+
+                        <th class="text-left p-4">
+                            Device
+                        </th>
+
+                        <th class="text-left p-4">
+                            Client
+                        </th>
+
+                        <th class="text-left p-4">
+                            Solde
+                        </th>
+
+                        <th class="text-left p-4">
+                            ESP32
+                        </th>
+
+                        <th class="text-left p-4">
+                            Contacteur
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for compteur in derniers_compteurs %}
+
+                    <tr class="border-t">
+
+                        <td class="p-4 font-semibold">
+                            {{ compteur.device_id }}
+                        </td>
+
+                        <td class="p-4">
+                            {{ compteur.utilisateur.username }}
+                        </td>
+
+                        <td class="p-4">
+                            {{ compteur.solde }} kWh
+                        </td>
+
+                        <td class="p-4">
+
+                            {% if compteur.esp32_connecte %}
+
+                                <span class="text-green-600">
+                                    ● Connecté
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-red-600">
+                                    ● Déconnecté
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td class="p-4">
+
+                            {% if compteur.contacteur %}
+
+                                <span class="text-green-600">
+                                    ON
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-red-600">
+                                    OFF
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="p-8 text-center text-slate-500"
+                        >
+                            Aucun compteur enregistré.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- HISTORIQUE -->
+
+    <div class="bg-white rounded-2xl shadow-sm mt-6 overflow-hidden">
+
+        <div class="p-6 border-b">
+
+            <h2 class="text-xl font-bold">
+                Dernières commandes
+            </h2>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full">
+
+                <thead class="bg-slate-50">
+
+                    <tr>
+
+                        <th class="text-left p-4">
+                            Compteur
+                        </th>
+
+                        <th class="text-left p-4">
+                            Action
+                        </th>
+
+                        <th class="text-left p-4">
+                            Motif
+                        </th>
+
+                        <th class="text-left p-4">
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for commande in dernieres_commandes %}
+
+                    <tr class="border-t">
+
+                        <td class="p-4">
+                            {{ commande.compteur.device_id }}
+                        </td>
+
+                        <td class="p-4 font-semibold">
+
+                            {% if commande.action == "ON" %}
+
+                                <span class="text-green-600">
+                                    ON
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-red-600">
+                                    OFF
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="p-4">
+                            {{ commande.motif|default:"-" }}
+                        </td>
+
+                        <td class="p-4">
+                            {{ commande.date_action|date:"d/m/Y H:i" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="p-8 text-center text-slate-500"
+                        >
+                            Aucune commande enregistrée.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
