@@ -1,0 +1,563 @@
+
+@font-face {
+    font-family: "LCD";
+    src: url("../fonts/lcd.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================================
+   VARIABLES
+============================================================ */
+
+:root {
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+
+    --green: #16a34a;
+    --green-light: #dcfce7;
+
+    --orange: #f59e0b;
+    --orange-light: #fef3c7;
+
+    --purple: #7c3aed;
+    --purple-light: #ede9fe;
+
+    --red: #dc2626;
+    --red-light: #fee2e2;
+
+    --gray: #64748b;
+    --gray-light: #f1f5f9;
+
+    --dark: #0f172a;
+}
+
+
+/* ============================================================
+   CARTES COMPTEUR
+============================================================ */
+
+.compteur-card-temps-reel {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.compteur-card-temps-reel:hover {
+    transform: translateY(-2px);
+}
+
+
+/* ============================================================
+   STATUT ESP32
+============================================================ */
+
+.statut-esp32 {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: inline-block;
+    background: #94a3b8;
+    box-shadow: 0 0 0 4px rgba(148, 163, 184, .15);
+}
+
+.statut-esp32.connecte {
+    background: var(--green);
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, .15);
+}
+
+.statut-esp32.deconnecte {
+    background: var(--red);
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, .15);
+}
+
+
+/* ============================================================
+   CARTES MESURES
+============================================================ */
+
+.tension-card,
+.courant-card,
+.puissance-card,
+.energie-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, .06);
+}
+
+
+/* ============================================================
+   ICONES
+============================================================ */
+
+.tension-icon {
+    color: var(--blue);
+}
+
+.courant-icon {
+    color: var(--orange);
+}
+
+.puissance-icon {
+    color: var(--purple);
+}
+
+.energie-icon {
+    color: var(--green);
+}
+
+
+/* ============================================================
+   JAUGE GENERALE
+============================================================ */
+
+.meter {
+    position: relative;
+    width: 230px;
+    height: 185px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   ARC DE JAUGE
+============================================================ */
+
+.meter-arc {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+
+    width: 210px;
+    height: 210px;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    /*
+       Seulement la partie haute de l'arc est visible.
+    */
+    border: 18px solid #e2e8f0;
+
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+
+    transform-origin: center;
+}
+
+
+/* ============================================================
+   TENSION
+   Jauge complète + aiguille
+============================================================ */
+
+.tension-arc {
+    border-top-color: var(--blue);
+    border-right-color: var(--blue);
+
+    transform:
+        translateX(-50%)
+        rotate(-45deg);
+}
+
+
+/* ============================================================
+   COURANT
+   JAUGE DYNAMIQUE SANS AIGUILLE
+============================================================ */
+
+.courant-arc {
+    border-color: #e2e8f0;
+
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+
+    transform:
+        translateX(-50%)
+        rotate(-45deg);
+
+    /*
+       Le JS modifie --progress-angle.
+    */
+    background:
+        conic-gradient(
+            from 225deg,
+            var(--orange) 0deg,
+            var(--orange) var(--progress-angle, 0deg),
+            transparent var(--progress-angle, 0deg)
+        );
+
+    border: none;
+    width: 210px;
+    height: 210px;
+}
+
+
+/* ============================================================
+   ENERGIE
+   JAUGE DYNAMIQUE SANS AIGUILLE
+============================================================ */
+
+.energie-arc {
+    border-color: #e2e8f0;
+
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+
+    transform:
+        translateX(-50%)
+        rotate(-45deg);
+
+    background:
+        conic-gradient(
+            from 225deg,
+            var(--green) 0deg,
+            var(--green) var(--progress-angle, 0deg),
+            transparent var(--progress-angle, 0deg)
+        );
+
+    border: none;
+    width: 210px;
+    height: 210px;
+}
+
+
+/* ============================================================
+   MASQUE INTERIEUR DES JAUGES
+============================================================ */
+
+.courant-card .meter::after,
+.energie-card .meter::after {
+    content: "";
+
+    position: absolute;
+
+    width: 174px;
+    height: 174px;
+
+    left: 50%;
+    top: 26px;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background: white;
+}
+
+
+/* ============================================================
+   GRADUATIONS
+============================================================ */
+
+.meter-ticks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.meter-ticks::before {
+    content: "0          25          50          75          100";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 30px;
+
+    transform: translateX(-50%);
+
+    width: 205px;
+
+    text-align: center;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    color: #94a3b8;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   AIGUILLE TENSION
+============================================================ */
+
+.meter-needle {
+    position: absolute;
+
+    width: 5px;
+    height: 72px;
+
+    left: 50%;
+    top: 38px;
+
+    background: var(--blue);
+
+    border-radius: 10px;
+
+    transform-origin: 50% 100%;
+
+    transform:
+        translateX(-50%)
+        rotate(-90deg);
+
+    transition:
+        transform .5s cubic-bezier(.4, 1.4, .4, 1);
+    
+    z-index: 10;
+}
+
+
+/* ============================================================
+   POINTE CENTRALE
+============================================================ */
+
+.meter-pin {
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    left: 50%;
+    top: 102px;
+
+    transform: translate(-50%, -50%);
+
+    background: white;
+
+    border: 5px solid var(--blue);
+
+    border-radius: 50%;
+
+    z-index: 11;
+}
+
+
+/* ============================================================
+   VALEUR TENSION
+============================================================ */
+
+.tension-meter-value {
+    position: absolute;
+
+    left: 50%;
+    top: 118px;
+
+    transform: translateX(-50%);
+
+    font-size: 28px;
+    font-weight: 800;
+
+    color: var(--blue);
+
+    z-index: 12;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   VALEUR CENTRALE COURANT / ENERGIE
+============================================================ */
+
+.meter-center-value {
+    position: absolute;
+
+    left: 50%;
+    top: 78px;
+
+    transform: translateX(-50%);
+
+    font-size: 30px;
+    font-weight: 800;
+
+    text-align: center;
+
+    z-index: 20;
+
+    white-space: nowrap;
+}
+
+.courant-card .meter-center-value {
+    color: var(--orange);
+}
+
+.energie-card .meter-center-value {
+    color: var(--green);
+}
+
+.energy-center-value {
+    font-size: 27px;
+}
+
+
+/* ============================================================
+   LCD PUISSANCE
+============================================================ */
+
+.lcd-power {
+    margin: 25px auto;
+
+    width: 250px;
+    min-height: 115px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #07130d,
+            #10251a
+        );
+
+    border: 5px solid #334155;
+
+    box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, .8),
+        0 8px 25px rgba(15, 23, 42, .15);
+}
+
+
+.lcd-power-value {
+    font-family: "LCD", monospace;
+
+    font-size: 52px;
+
+    line-height: 1;
+
+    color: #65ff9a;
+
+    text-shadow:
+        0 0 5px rgba(101, 255, 154, .7),
+        0 0 15px rgba(101, 255, 154, .4);
+
+    letter-spacing: 3px;
+}
+
+
+.lcd-power-unit {
+    margin-top: 10px;
+
+    font-family: "LCD", monospace;
+
+    font-size: 18px;
+
+    color: #65ff9a;
+
+    letter-spacing: 3px;
+}
+
+
+/* ============================================================
+   CONTACTEUR
+============================================================ */
+
+.compteur-contacteur {
+    transition: all .3s ease;
+}
+
+.contacteur-on {
+    color: var(--green);
+}
+
+.contacteur-off {
+    color: var(--red);
+}
+
+
+/* ============================================================
+   STATUT TEMPS REEL
+============================================================ */
+
+#statusLiveDot {
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    display: inline-block;
+
+    background: var(--gray);
+}
+
+#statusLiveDot.live {
+    background: var(--green);
+
+    box-shadow:
+        0 0 0 4px rgba(22, 163, 74, .15);
+
+    animation: pulse-live 1.5s infinite;
+}
+
+#statusLiveDot.error {
+    background: var(--red);
+}
+
+
+/* ============================================================
+   ANIMATION
+============================================================ */
+
+@keyframes pulse-live {
+    0% {
+        box-shadow:
+            0 0 0 0 rgba(22, 163, 74, .4);
+    }
+
+    70% {
+        box-shadow:
+            0 0 0 8px rgba(22, 163, 74, 0);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(22, 163, 74, 0);
+    }
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 768px) {
+
+    .meter {
+        width: 210px;
+        height: 175px;
+    }
+
+    .meter-arc,
+    .courant-arc,
+    .energie-arc {
+        width: 190px;
+        height: 190px;
+    }
+
+    .lcd-power {
+        width: 220px;
+    }
+
+    .lcd-power-value {
+        font-size: 45px;
+    }
+
+    .tension-meter-value {
+        font-size: 25px;
+    }
+
+    .meter-center-value {
+        font-size: 27px;
+    }
+}
+

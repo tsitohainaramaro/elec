@@ -1,0 +1,1789 @@
+{% extends "compteur/base.html" %}
+
+{% load static %}
+
+{% block title %}Supervision des compteurs{% endblock %}
+
+{% block content %}
+
+<div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+<!-- ====================================================== -->
+<!-- HEADER -->
+<!-- ====================================================== -->
+
+<div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+    <div class="flex items-center gap-3">
+
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+            <i data-lucide="activity" class="h-6 w-6"></i>
+        </div>
+
+        <div>
+
+            <div class="flex items-center gap-2">
+
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900">
+                    Supervision des compteurs
+                </h1>
+
+                <span
+                    class="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 sm:inline-flex"
+                >
+                    Temps réel
+                </span>
+
+            </div>
+
+            <p class="mt-1 text-sm text-gray-500">
+                Surveillance des compteurs électriques, ESP32 et contacteurs.
+            </p>
+
+        </div>
+
+    </div>
+
+    <a
+        href="{% url 'compteur:dashboard_admin' %}"
+        class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+    >
+        <i data-lucide="arrow-left" class="h-4 w-4"></i>
+        Dashboard
+    </a>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- STATISTIQUES PRINCIPALES -->
+<!-- ====================================================== -->
+
+<div class="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+    <!-- TOTAL -->
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+
+        <div class="flex items-center justify-between gap-3">
+
+            <div>
+
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Compteurs
+                </p>
+
+                <p
+                    id="totalCompteurs"
+                    class="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl"
+                >
+                    0
+                </p>
+
+            </div>
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 sm:h-11 sm:w-11">
+                <i data-lucide="gauge" class="h-5 w-5"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ESP32 -->
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+
+        <div class="flex items-center justify-between gap-3">
+
+            <div>
+
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    ESP32 connectés
+                </p>
+
+                <p
+                    id="compteursConnectes"
+                    class="mt-1 text-2xl font-bold text-emerald-600 sm:text-3xl"
+                >
+                    0
+                </p>
+
+            </div>
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 sm:h-11 sm:w-11">
+                <i data-lucide="wifi" class="h-5 w-5"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SOLDE -->
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+
+        <div class="flex items-center justify-between gap-3">
+
+            <div>
+
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Solde total
+                </p>
+
+                <p class="mt-1 text-xl font-bold text-emerald-600 sm:text-2xl">
+
+                    <span id="soldeTotal">0.000</span>
+
+                    <span class="text-xs font-semibold text-gray-400">
+                        kWh
+                    </span>
+
+                </p>
+
+            </div>
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 sm:h-11 sm:w-11">
+                <i data-lucide="wallet" class="h-5 w-5"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONSOMMATION -->
+
+    <div class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+
+        <div class="flex items-center justify-between gap-3">
+
+            <div>
+
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Consommation
+                </p>
+
+                <p class="mt-1 text-xl font-bold text-orange-600 sm:text-2xl">
+
+                    <span id="consommationTotale">0.000</span>
+
+                    <span class="text-xs font-semibold text-gray-400">
+                        kWh
+                    </span>
+
+                </p>
+
+            </div>
+
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600 sm:h-11 sm:w-11">
+                <i data-lucide="zap" class="h-5 w-5"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- BARRE DE SUPERVISION -->
+<!-- ====================================================== -->
+
+<div class="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+        <div>
+
+            <p class="text-sm font-bold text-gray-900">
+                État du réseau électrique
+            </p>
+
+            <p class="mt-1 text-xs text-gray-500">
+                Vue globale de la connexion et de l'alimentation des compteurs.
+            </p>
+
+        </div>
+
+
+        <div class="grid grid-cols-3 gap-2 sm:gap-3">
+
+            <!-- COUPÉS -->
+
+            <div class="rounded-xl bg-red-50 px-3 py-2.5 text-center">
+
+                <p class="text-[10px] font-bold uppercase tracking-wide text-red-500">
+                    Coupés
+                </p>
+
+                <p
+                    id="compteursCoupes"
+                    class="mt-0.5 text-lg font-bold text-red-700"
+                >
+                    0
+                </p>
+
+            </div>
+
+
+            <!-- NON AUTORISÉS -->
+
+            <div class="rounded-xl bg-orange-50 px-3 py-2.5 text-center">
+
+                <p class="text-[10px] font-bold uppercase tracking-wide text-orange-500">
+                    Bloqués
+                </p>
+
+                <p
+                    id="compteursNonAutorises"
+                    class="mt-0.5 text-lg font-bold text-orange-700"
+                >
+                    0
+                </p>
+
+            </div>
+
+
+            <!-- API -->
+
+            <div
+                id="indicateurAPI"
+                class="rounded-xl bg-yellow-50 px-3 py-2.5 text-center text-yellow-700"
+            >
+
+                <p class="text-[10px] font-bold uppercase tracking-wide">
+                    API
+                </p>
+
+                <p
+                    id="statutAPI"
+                    class="mt-0.5 text-xs font-bold"
+                >
+                    Chargement...
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- RECHERCHE / FILTRE -->
+<!-- ====================================================== -->
+
+<div class="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+
+    <div class="flex flex-col gap-3 lg:flex-row">
+
+        <div class="relative flex-1">
+
+            <i
+                data-lucide="search"
+                class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+            ></i>
+
+            <input
+                id="rechercheCompteur"
+                type="text"
+                placeholder="Rechercher un compteur, client ou Device ID..."
+                class="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+            >
+
+        </div>
+
+        <div class="lg:w-64">
+
+            <select
+                id="filtreCompteur"
+                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+            >
+
+                <option value="tous">Tous les compteurs</option>
+                <option value="connecte">ESP32 connectés</option>
+                <option value="deconnecte">ESP32 déconnectés</option>
+                <option value="on">Contacteur ON</option>
+                <option value="off">Contacteur OFF</option>
+                <option value="autorise">Autorisés</option>
+                <option value="non_autorise">Non autorisés</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CONNEXION -->
+<!-- ====================================================== -->
+
+<div class="mb-3 flex items-center justify-between">
+
+    <div class="flex items-center gap-2">
+
+        <span
+            id="pointConnexion"
+            class="h-2.5 w-2.5 rounded-full bg-yellow-400"
+        ></span>
+
+        <span
+            id="texteConnexion"
+            class="text-xs font-medium text-gray-500"
+        >
+            Connexion à l'API...
+        </span>
+
+    </div>
+
+    <div
+        id="heureActualisation"
+        class="text-xs text-gray-400"
+    ></div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- LISTE SUPERVISION -->
+<!-- ====================================================== -->
+
+<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+    <!-- HEADER LISTE -->
+
+    <div class="flex flex-col gap-3 border-b border-gray-100 px-5 py-5 sm:px-6 md:flex-row md:items-center md:justify-between">
+
+        <div>
+
+            <div class="flex items-center gap-2">
+
+                <h2 class="text-base font-bold text-gray-900">
+                    Supervision des équipements
+                </h2>
+
+                <span class="hidden rounded-full bg-gray-100 px-2 py-1 text-[10px] font-bold text-gray-500 sm:inline-flex">
+                    ESP32 • PZEM • CONTACTEUR
+                </span>
+
+            </div>
+
+            <p class="mt-1 text-xs text-gray-500">
+                État actuel des installations électriques.
+            </p>
+
+        </div>
+
+        <span
+            id="nombreResultats"
+            class="w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600"
+        >
+            0 compteur
+        </span>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- TABLE DESKTOP -->
+    <!-- ================================================== -->
+
+    <div
+        id="tableContainer"
+        class="hidden overflow-x-auto lg:block"
+    >
+
+        <table class="w-full text-left">
+
+            <thead class="border-b border-gray-200 bg-gray-50">
+
+                <tr>
+
+                    <th class="px-5 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Installation
+                    </th>
+
+                    <th class="px-5 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Client
+                    </th>
+
+                    <th class="px-5 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Énergie disponible
+                    </th>
+
+                    <th class="px-5 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Mesures
+                    </th>
+
+                    <th class="px-5 py-4 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Supervision
+                    </th>
+
+                    <th class="px-5 py-4 text-right text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody
+                id="tableauCompteurs"
+                class="divide-y divide-gray-100"
+            >
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="px-6 py-16 text-center text-sm text-gray-500"
+                    >
+
+                        <div class="flex flex-col items-center">
+
+                            <i
+                                data-lucide="loader-circle"
+                                class="mb-3 h-7 w-7 animate-spin text-emerald-500"
+                            ></i>
+
+                            Chargement des installations...
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- CARTES MOBILE -->
+    <!-- ================================================== -->
+
+    <div
+        id="cartesCompteurs"
+        class="space-y-4 p-4 lg:hidden"
+    >
+
+        <div class="rounded-2xl border border-gray-200 p-8 text-center text-sm text-gray-500">
+            Chargement des installations...
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- AUCUN RESULTAT -->
+    <!-- ================================================== -->
+
+    <div
+        id="aucunCompteur"
+        class="hidden px-6 py-16 text-center"
+    >
+
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 text-gray-400">
+
+            <i data-lucide="gauge" class="h-8 w-8"></i>
+
+        </div>
+
+        <h3 class="mt-5 text-lg font-bold text-gray-900">
+            Aucun compteur trouvé
+        </h3>
+
+        <p class="mx-auto mt-2 max-w-md text-sm text-gray-500">
+            Aucun compteur ne correspond à votre recherche ou à votre filtre.
+        </p>
+
+    </div>
+
+</div>
+
+</div>
+
+<!-- ========================================================== -->
+
+<!-- JAVASCRIPT -->
+
+<!-- ========================================================== -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const API_URL =
+        "{% url 'compteur:api_admin_compteurs' %}";
+
+    let compteurs = [];
+    let chargementEnCours = false;
+
+
+    /* ========================================================
+       ELEMENTS
+    ======================================================== */
+
+    const tableauCompteurs =
+        document.getElementById("tableauCompteurs");
+
+    const cartesCompteurs =
+        document.getElementById("cartesCompteurs");
+
+    const aucunCompteur =
+        document.getElementById("aucunCompteur");
+
+    const rechercheCompteur =
+        document.getElementById("rechercheCompteur");
+
+    const filtreCompteur =
+        document.getElementById("filtreCompteur");
+
+    const totalCompteurs =
+        document.getElementById("totalCompteurs");
+
+    const compteursConnectes =
+        document.getElementById("compteursConnectes");
+
+    const compteursCoupes =
+        document.getElementById("compteursCoupes");
+
+    const compteursNonAutorises =
+        document.getElementById("compteursNonAutorises");
+
+    const soldeTotal =
+        document.getElementById("soldeTotal");
+
+    const consommationTotale =
+        document.getElementById("consommationTotale");
+
+    const statutAPI =
+        document.getElementById("statutAPI");
+
+    const indicateurAPI =
+        document.getElementById("indicateurAPI");
+
+    const pointConnexion =
+        document.getElementById("pointConnexion");
+
+    const texteConnexion =
+        document.getElementById("texteConnexion");
+
+    const heureActualisation =
+        document.getElementById("heureActualisation");
+
+    const nombreResultats =
+        document.getElementById("nombreResultats");
+
+
+    /* ========================================================
+       FORMATAGE
+    ======================================================== */
+
+    function nombre(value, decimals = 3) {
+
+        const n = Number(value);
+
+        if (isNaN(n)) {
+            return "0.000";
+        }
+
+        return n.toFixed(decimals);
+
+    }
+
+
+    function escapeHTML(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    function formaterDate(dateString) {
+
+        if (!dateString) {
+            return "—";
+        }
+
+        const date =
+            new Date(dateString);
+
+        if (isNaN(date.getTime())) {
+            return "—";
+        }
+
+        return date.toLocaleString(
+            "fr-FR",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            }
+        );
+
+    }
+
+
+    /* ========================================================
+       ETAT ESP32
+    ======================================================== */
+
+    function supervisionESP32(compteur) {
+
+        if (compteur.esp32_connecte) {
+
+            return `
+                <div
+                    title="ESP32 connecté"
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"
+                >
+                    <i data-lucide="wifi" class="h-5 w-5"></i>
+                </div>
+            `;
+
+        }
+
+        return `
+            <div
+                title="ESP32 hors ligne"
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-400"
+            >
+                <i data-lucide="wifi-off" class="h-5 w-5"></i>
+            </div>
+        `;
+
+    }
+
+
+    /* ========================================================
+       CONTACTEUR REEL
+    ======================================================== */
+
+    function supervisionContacteur(compteur) {
+
+        if (compteur.contacteur) {
+
+            return `
+                <div
+                    title="Contacteur réel : ON"
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"
+                >
+                    <i data-lucide="power" class="h-5 w-5"></i>
+                </div>
+            `;
+
+        }
+
+        return `
+            <div
+                title="Contacteur réel : OFF"
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600"
+            >
+                <i data-lucide="power-off" class="h-5 w-5"></i>
+            </div>
+        `;
+
+    }
+
+
+    /* ========================================================
+       AUTORISATION
+    ======================================================== */
+
+    function supervisionAutorisation(compteur) {
+
+        if (compteur.autorisation) {
+
+            return `
+                <div
+                    title="Compteur autorisé"
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600"
+                >
+                    <i data-lucide="shield-check" class="h-5 w-5"></i>
+                </div>
+            `;
+
+        }
+
+        return `
+            <div
+                title="Compteur non autorisé"
+                class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600"
+            >
+                <i data-lucide="shield-off" class="h-5 w-5"></i>
+            </div>
+        `;
+
+    }
+
+
+    /* ========================================================
+       ETAT GLOBAL
+    ======================================================== */
+
+    function etatGlobal(compteur) {
+
+        const solde =
+            Number(compteur.solde || 0);
+
+        if (!compteur.esp32_connecte) {
+
+            return `
+                <div class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-bold text-gray-600">
+
+                    <span class="h-2 w-2 rounded-full bg-gray-400"></span>
+
+                    Hors ligne
+
+                </div>
+            `;
+
+        }
+
+        if (!compteur.autorisation) {
+
+            return `
+                <div class="inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700">
+
+                    <span class="h-2 w-2 rounded-full bg-orange-500"></span>
+
+                    Bloqué
+
+                </div>
+            `;
+
+        }
+
+        if (solde <= 0) {
+
+            return `
+                <div class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700">
+
+                    <span class="h-2 w-2 rounded-full bg-red-500"></span>
+
+                    Solde épuisé
+
+                </div>
+            `;
+
+        }
+
+        if (!compteur.contacteur) {
+
+            return `
+                <div class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700">
+
+                    <span class="h-2 w-2 rounded-full bg-red-500"></span>
+
+                    Coupé
+
+                </div>
+            `;
+
+        }
+
+        return `
+            <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
+
+                <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
+
+                Normal
+
+            </div>
+        `;
+
+    }
+
+
+    /* ========================================================
+       SOLDE
+    ======================================================== */
+
+    function afficherSolde(compteur) {
+
+        const solde =
+            Number(compteur.solde || 0);
+
+        if (solde <= 0) {
+
+            return `
+                <div>
+
+                    <div class="flex items-baseline gap-1">
+
+                        <span class="text-xl font-bold text-red-600">
+                            ${nombre(solde)}
+                        </span>
+
+                        <span class="text-xs font-semibold text-gray-400">
+                            kWh
+                        </span>
+
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-1 text-[11px] font-bold text-red-600">
+
+                        <i data-lucide="circle-alert" class="h-3 w-3"></i>
+
+                        Solde épuisé
+
+                    </div>
+
+                </div>
+            `;
+
+        }
+
+        return `
+            <div>
+
+                <div class="flex items-baseline gap-1">
+
+                    <span class="text-xl font-bold text-emerald-600">
+                        ${nombre(solde)}
+                    </span>
+
+                    <span class="text-xs font-semibold text-gray-400">
+                        kWh
+                    </span>
+
+                </div>
+
+                <div class="mt-1 text-[11px] text-gray-400">
+                    Énergie disponible
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    /* ========================================================
+       PZEM
+    ======================================================== */
+
+    function afficherMesure(compteur) {
+
+        const mesure =
+            compteur.derniere_mesure;
+
+        if (!mesure) {
+
+            return `
+                <div class="rounded-xl bg-gray-50 px-3 py-3 text-xs text-gray-400">
+                    Aucune mesure
+                </div>
+            `;
+
+        }
+
+        return `
+
+            <div class="grid grid-cols-3 gap-2">
+
+                <div class="rounded-xl bg-gray-50 p-2.5">
+
+                    <p class="text-[10px] font-semibold uppercase text-gray-400">
+                        U
+                    </p>
+
+                    <p class="mt-1 text-sm font-bold text-gray-800">
+                        ${nombre(mesure.tension, 1)}
+                        <span class="text-[10px] font-medium text-gray-400">V</span>
+                    </p>
+
+                </div>
+
+
+                <div class="rounded-xl bg-gray-50 p-2.5">
+
+                    <p class="text-[10px] font-semibold uppercase text-gray-400">
+                        I
+                    </p>
+
+                    <p class="mt-1 text-sm font-bold text-gray-800">
+                        ${nombre(mesure.courant, 3)}
+                        <span class="text-[10px] font-medium text-gray-400">A</span>
+                    </p>
+
+                </div>
+
+
+                <div class="rounded-xl bg-emerald-50 p-2.5">
+
+                    <p class="text-[10px] font-semibold uppercase text-emerald-500">
+                        P
+                    </p>
+
+                    <p class="mt-1 text-sm font-bold text-emerald-700">
+                        ${nombre(mesure.puissance, 2)}
+                        <span class="text-[10px] font-medium">W</span>
+                    </p>
+
+                </div>
+
+            </div>
+
+            <p class="mt-2 text-[10px] text-gray-400">
+                Mesure : ${formaterDate(mesure.date_mesure)}
+            </p>
+
+        `;
+
+    }
+
+
+    /* ========================================================
+       URLS
+    ======================================================== */
+
+    function urlDetail(id) {
+
+        return `/compteur/${id}/`;
+
+    }
+
+
+    function urlRecharge(id) {
+
+        return `/admin-dashboard/compteurs/${id}/recharger/`;
+
+    }
+
+
+    /* ========================================================
+       FILTRAGE
+    ======================================================== */
+
+    function obtenirCompteursFiltres() {
+
+        const recherche =
+            rechercheCompteur.value
+                .trim()
+                .toLowerCase();
+
+        const filtre =
+            filtreCompteur.value;
+
+        return compteurs.filter(
+            function (compteur) {
+
+                const texte = [
+
+                    compteur.nom,
+                    compteur.device_id,
+                    compteur.username,
+                    compteur.client_nom,
+                    compteur.email
+
+                ]
+                .join(" ")
+                .toLowerCase();
+
+                if (!texte.includes(recherche)) {
+                    return false;
+                }
+
+                if (
+                    filtre === "connecte" &&
+                    !compteur.esp32_connecte
+                ) {
+                    return false;
+                }
+
+                if (
+                    filtre === "deconnecte" &&
+                    compteur.esp32_connecte
+                ) {
+                    return false;
+                }
+
+                if (
+                    filtre === "on" &&
+                    !compteur.contacteur
+                ) {
+                    return false;
+                }
+
+                if (
+                    filtre === "off" &&
+                    compteur.contacteur
+                ) {
+                    return false;
+                }
+
+                if (
+                    filtre === "autorise" &&
+                    !compteur.autorisation
+                ) {
+                    return false;
+                }
+
+                if (
+                    filtre === "non_autorise" &&
+                    compteur.autorisation
+                ) {
+                    return false;
+                }
+
+                return true;
+
+            }
+        );
+
+    }
+
+
+    /* ========================================================
+       AFFICHAGE
+    ======================================================== */
+
+    function afficherCompteurs() {
+
+        const resultats =
+            obtenirCompteursFiltres();
+
+        nombreResultats.textContent =
+            resultats.length +
+            (
+                resultats.length > 1
+                    ? " compteurs"
+                    : " compteur"
+            );
+
+        if (resultats.length === 0) {
+
+            tableauCompteurs.innerHTML = "";
+
+            cartesCompteurs.innerHTML = "";
+
+            aucunCompteur.classList.remove("hidden");
+
+            return;
+
+        }
+
+        aucunCompteur.classList.add("hidden");
+
+
+        /* ====================================================
+           DESKTOP
+        ==================================================== */
+
+        tableauCompteurs.innerHTML =
+            resultats.map(
+                function (compteur) {
+
+                    return `
+
+                        <tr class="transition hover:bg-gray-50/80">
+
+
+                            <!-- INSTALLATION -->
+
+                            <td class="px-5 py-5">
+
+                                <div class="flex items-center gap-3">
+
+                                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+
+                                        <i data-lucide="cpu" class="h-5 w-5"></i>
+
+                                    </div>
+
+                                    <div class="min-w-0">
+
+                                        <div class="flex items-center gap-2">
+
+                                            <p class="truncate font-bold text-gray-900">
+                                                ${escapeHTML(compteur.nom)}
+                                            </p>
+
+                                            ${etatGlobal(compteur)}
+
+                                        </div>
+
+                                        <p class="mt-1 text-xs text-gray-400">
+                                            ${escapeHTML(compteur.device_id)}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- CLIENT -->
+
+                            <td class="px-5 py-5">
+
+                                <p class="text-sm font-semibold text-gray-900">
+                                    ${escapeHTML(compteur.client_nom)}
+                                </p>
+
+                                <p class="mt-1 text-xs text-gray-400">
+                                    @${escapeHTML(compteur.username)}
+                                </p>
+
+                            </td>
+
+
+                            <!-- SOLDE -->
+
+                            <td class="px-5 py-5">
+
+                                ${afficherSolde(compteur)}
+
+                            </td>
+
+
+                            <!-- PZEM -->
+
+                            <td class="min-w-[250px] px-5 py-5">
+
+                                ${afficherMesure(compteur)}
+
+                            </td>
+
+
+                            <!-- SUPERVISION -->
+
+                            <td class="px-5 py-5">
+
+                                <div class="flex items-center gap-2">
+
+                                    ${supervisionESP32(compteur)}
+
+                                    ${supervisionContacteur(compteur)}
+
+                                    ${supervisionAutorisation(compteur)}
+
+                                </div>
+
+                                <p class="mt-2 text-[10px] text-gray-400">
+                                    ESP32 • Contacteur • Autorisation
+                                </p>
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="px-5 py-5">
+
+                                <div class="flex items-center justify-end gap-2">
+
+                                    <a
+                                        href="${urlDetail(compteur.id)}"
+                                        title="Voir le détail"
+                                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+                                    >
+
+                                        <i data-lucide="eye" class="h-4 w-4"></i>
+
+                                    </a>
+
+                                    <a
+                                        href="${urlRecharge(compteur.id)}"
+                                        title="Recharger"
+                                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm transition hover:bg-emerald-700"
+                                    >
+
+                                        <i data-lucide="zap" class="h-4 w-4"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+        /* ====================================================
+           MOBILE
+        ==================================================== */
+
+        cartesCompteurs.innerHTML =
+            resultats.map(
+                function (compteur) {
+
+                    const mesure =
+                        compteur.derniere_mesure;
+
+                    return `
+
+                        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+
+                            <!-- HEADER -->
+
+                            <div class="border-b border-gray-100 p-4">
+
+                                <div class="flex items-start justify-between gap-3">
+
+                                    <div class="flex min-w-0 items-center gap-3">
+
+                                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+
+                                            <i data-lucide="cpu" class="h-5 w-5"></i>
+
+                                        </div>
+
+                                        <div class="min-w-0">
+
+                                            <h3 class="truncate font-bold text-gray-900">
+                                                ${escapeHTML(compteur.nom)}
+                                            </h3>
+
+                                            <p class="mt-1 truncate text-xs text-gray-400">
+                                                ${escapeHTML(compteur.device_id)}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    ${etatGlobal(compteur)}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SOLDE -->
+
+                            <div class="p-4">
+
+                                <div class="rounded-2xl bg-emerald-50 p-4">
+
+                                    <div class="flex items-center justify-between">
+
+                                        <div>
+
+                                            <p class="text-xs font-semibold text-emerald-700">
+                                                Solde disponible
+                                            </p>
+
+                                            <p class="mt-1 text-2xl font-bold text-emerald-700">
+
+                                                ${nombre(compteur.solde)}
+
+                                                <span class="text-xs">
+                                                    kWh
+                                                </span>
+
+                                            </p>
+
+                                        </div>
+
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-600">
+
+                                            <i data-lucide="wallet" class="h-5 w-5"></i>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- CLIENT -->
+
+                                <div class="mt-3 rounded-xl bg-gray-50 p-3">
+
+                                    <p class="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                                        Client
+                                    </p>
+
+                                    <p class="mt-1 text-sm font-semibold text-gray-900">
+                                        ${escapeHTML(compteur.client_nom)}
+                                    </p>
+
+                                    <p class="mt-1 text-xs text-gray-400">
+                                        @${escapeHTML(compteur.username)}
+                                    </p>
+
+                                </div>
+
+
+                                <!-- PZEM -->
+
+                                <div class="mt-3 rounded-2xl border border-gray-100 p-3">
+
+                                    <div class="mb-3 flex items-center justify-between">
+
+                                        <p class="text-xs font-bold text-gray-700">
+                                            Mesures électriques
+                                        </p>
+
+                                        <i data-lucide="activity" class="h-4 w-4 text-emerald-500"></i>
+
+                                    </div>
+
+                                    ${
+                                        mesure
+                                        ? `
+                                            <div class="grid grid-cols-3 gap-2">
+
+                                                <div class="rounded-xl bg-gray-50 p-2 text-center">
+
+                                                    <p class="text-[10px] text-gray-400">
+                                                        Tension
+                                                    </p>
+
+                                                    <p class="mt-1 text-sm font-bold text-gray-800">
+                                                        ${nombre(mesure.tension, 1)}
+                                                    </p>
+
+                                                    <p class="text-[10px] text-gray-400">
+                                                        V
+                                                    </p>
+
+                                                </div>
+
+                                                <div class="rounded-xl bg-gray-50 p-2 text-center">
+
+                                                    <p class="text-[10px] text-gray-400">
+                                                        Courant
+                                                    </p>
+
+                                                    <p class="mt-1 text-sm font-bold text-gray-800">
+                                                        ${nombre(mesure.courant, 3)}
+                                                    </p>
+
+                                                    <p class="text-[10px] text-gray-400">
+                                                        A
+                                                    </p>
+
+                                                </div>
+
+                                                <div class="rounded-xl bg-emerald-50 p-2 text-center">
+
+                                                    <p class="text-[10px] text-emerald-600">
+                                                        Puissance
+                                                    </p>
+
+                                                    <p class="mt-1 text-sm font-bold text-emerald-700">
+                                                        ${nombre(mesure.puissance, 2)}
+                                                    </p>
+
+                                                    <p class="text-[10px] text-emerald-600">
+                                                        W
+                                                    </p>
+
+                                                </div>
+
+                                            </div>
+
+                                            <p class="mt-2 text-[10px] text-gray-400">
+                                                ${formaterDate(mesure.date_mesure)}
+                                            </p>
+                                        `
+                                        : `
+                                            <p class="py-3 text-center text-xs text-gray-400">
+                                                Aucune mesure disponible
+                                            </p>
+                                        `
+                                    }
+
+                                </div>
+
+
+                                <!-- SUPERVISION -->
+
+                                <div class="mt-3 rounded-2xl border border-gray-100 p-3">
+
+                                    <p class="mb-3 text-xs font-bold text-gray-700">
+                                        État de l'installation
+                                    </p>
+
+                                    <div class="grid grid-cols-3 gap-2">
+
+                                        <div class="flex flex-col items-center rounded-xl bg-gray-50 p-3">
+
+                                            ${
+                                                supervisionESP32(compteur)
+                                            }
+
+                                            <span class="mt-2 text-[10px] font-semibold text-gray-500">
+                                                ESP32
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="flex flex-col items-center rounded-xl bg-gray-50 p-3">
+
+                                            ${
+                                                supervisionContacteur(compteur)
+                                            }
+
+                                            <span class="mt-2 text-[10px] font-semibold text-gray-500">
+                                                Contacteur
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="flex flex-col items-center rounded-xl bg-gray-50 p-3">
+
+                                            ${
+                                                supervisionAutorisation(compteur)
+                                            }
+
+                                            <span class="mt-2 text-[10px] font-semibold text-gray-500">
+                                                Autorisation
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DERNIERE CONNEXION -->
+
+                                <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+
+                                    <div>
+
+                                        <p class="text-[10px] text-gray-400">
+                                            Dernière communication
+                                        </p>
+
+                                        <p class="mt-1 text-xs font-semibold text-gray-600">
+                                            ${formaterDate(compteur.derniere_connexion)}
+                                        </p>
+
+                                    </div>
+
+                                    ${
+                                        compteur.esp32_connecte
+                                        ? `
+                                            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+
+                                                <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
+
+                                                En ligne
+
+                                            </div>
+                                        `
+                                        : `
+                                            <div class="flex items-center gap-1.5 text-xs font-bold text-gray-400">
+
+                                                <span class="h-2 w-2 rounded-full bg-gray-400"></span>
+
+                                                Hors ligne
+
+                                            </div>
+                                        `
+                                    }
+
+                                </div>
+
+
+                                <!-- ACTIONS -->
+
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+
+                                    <a
+                                        href="${urlDetail(compteur.id)}"
+                                        class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                                    >
+
+                                        <i data-lucide="eye" class="h-4 w-4"></i>
+
+                                        Détail
+
+                                    </a>
+
+                                    <a
+                                        href="${urlRecharge(compteur.id)}"
+                                        class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-bold text-white transition hover:bg-emerald-700"
+                                    >
+
+                                        <i data-lucide="zap" class="h-4 w-4"></i>
+
+                                        Recharger
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+    }
+
+
+    /* ========================================================
+       STATISTIQUES
+    ======================================================== */
+
+    function afficherStatistiques(statistiques) {
+
+        if (!statistiques) {
+            return;
+        }
+
+        totalCompteurs.textContent =
+            statistiques.nombre_compteurs ?? 0;
+
+        compteursConnectes.textContent =
+            statistiques.compteurs_connectes ?? 0;
+
+        compteursCoupes.textContent =
+            statistiques.compteurs_coupes ?? 0;
+
+        compteursNonAutorises.textContent =
+            statistiques.compteurs_non_autorises ?? 0;
+
+        soldeTotal.textContent =
+            nombre(
+                statistiques.solde_total,
+                3
+            );
+
+        consommationTotale.textContent =
+            nombre(
+                statistiques.consommation_totale,
+                3
+            );
+
+    }
+
+
+    /* ========================================================
+       API
+    ======================================================== */
+
+    async function chargerCompteurs() {
+
+        if (chargementEnCours) {
+            return;
+        }
+
+        chargementEnCours = true;
+
+        try {
+
+            const response =
+                await fetch(
+                    API_URL,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json"
+                        },
+
+                        cache: "no-store"
+                    }
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Erreur HTTP " +
+                    response.status
+                );
+
+            }
+
+            const data =
+                await response.json();
+
+            if (!data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Erreur API."
+                );
+
+            }
+
+            compteurs =
+                Array.isArray(data.compteurs)
+                    ? data.compteurs
+                    : [];
+
+            afficherStatistiques(
+                data.statistiques
+            );
+
+            afficherCompteurs();
+
+
+            /* ================================================
+               API OK
+            ================================================= */
+
+            statutAPI.textContent =
+                "Synchronisée";
+
+            statutAPI.className =
+                "mt-0.5 text-xs font-bold text-emerald-700";
+
+            indicateurAPI.className =
+                "rounded-xl bg-emerald-50 px-3 py-2.5 text-center text-emerald-700";
+
+            pointConnexion.className =
+                "h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500";
+
+            texteConnexion.textContent =
+                "API connectée";
+
+            texteConnexion.className =
+                "text-xs font-medium text-emerald-600";
+
+            heureActualisation.textContent =
+                "Actualisé à " +
+                new Date().toLocaleTimeString(
+                    "fr-FR",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit"
+                    }
+                );
+
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Erreur API compteurs :",
+                error
+            );
+
+            statutAPI.textContent =
+                "Erreur";
+
+            statutAPI.className =
+                "mt-0.5 text-xs font-bold text-red-700";
+
+            indicateurAPI.className =
+                "rounded-xl bg-red-50 px-3 py-2.5 text-center text-red-700";
+
+            pointConnexion.className =
+                "h-2.5 w-2.5 rounded-full bg-red-500";
+
+            texteConnexion.textContent =
+                "API inaccessible";
+
+            texteConnexion.className =
+                "text-xs font-medium text-red-600";
+
+        } finally {
+
+            chargementEnCours = false;
+
+        }
+
+    }
+
+
+    /* ========================================================
+       RECHERCHE
+    ======================================================== */
+
+    rechercheCompteur.addEventListener(
+        "input",
+        function () {
+
+            afficherCompteurs();
+
+        }
+    );
+
+
+    /* ========================================================
+       FILTRE
+    ======================================================== */
+
+    filtreCompteur.addEventListener(
+        "change",
+        function () {
+
+            afficherCompteurs();
+
+        }
+    );
+
+
+    /* ========================================================
+       INITIALISATION
+    ======================================================== */
+
+    chargerCompteurs();
+
+
+    /* ========================================================
+       TEMPS REEL
+       5 secondes
+    ======================================================== */
+
+    setInterval(
+        chargerCompteurs,
+        1000
+    );
+
+});
+
+</script>
+
+{% endblock %}

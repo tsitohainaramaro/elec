@@ -1,0 +1,224 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            Gestion Électricité
+        {% endblock %}
+    </title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- CSS -->
+    <link
+        rel="stylesheet"
+        href="{% static 'compteur/css/app.css' %}"
+    >
+
+</head>
+
+
+<body class="bg-slate-100 text-slate-800">
+
+
+<!-- OVERLAY MOBILE -->
+
+<div
+    id="sidebarOverlay"
+    class="hidden fixed inset-0 bg-black/40 z-30 lg:hidden"
+></div>
+
+
+<!-- SIDEBAR -->
+
+<aside
+    id="sidebar"
+    class="fixed left-0 top-0 z-40 h-screen w-64
+           bg-slate-900 text-white
+           transform -translate-x-full
+           lg:translate-x-0
+           transition-transform duration-300"
+>
+
+    <div class="p-6">
+
+        <h1 class="text-xl font-bold">
+            ⚡ Énergie
+        </h1>
+
+        <p class="text-slate-400 text-sm mt-1">
+            Gestion électrique
+        </p>
+
+    </div>
+
+
+    <nav class="px-3 space-y-2">
+
+        {% if request.user.is_staff %}
+
+            <a
+                href="{% url 'compteur:dashboard_admin' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="layout-dashboard"></i>
+                Dashboard
+            </a>
+
+            <a
+                href="{% url 'compteur:clients_admin' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="users"></i>
+                Clients
+            </a>
+
+            <a
+                href="{% url 'compteur:compteurs_admin' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="gauge"></i>
+                Compteurs
+            </a>
+
+            <a
+                href="{% url 'compteur:historique_admin' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="history"></i>
+                Historique
+            </a>
+
+        {% else %}
+
+            <a
+                href="{% url 'compteur:dashboard' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="layout-dashboard"></i>
+                Dashboard
+            </a>
+
+            <a
+                href="{% url 'compteur:consommation' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="chart-line"></i>
+                Consommation
+            </a>
+
+            <a
+                href="{% url 'compteur:profil' %}"
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+                <i data-lucide="user"></i>
+                Mon profil
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+
+    <div class="absolute bottom-0 left-0 right-0 p-4">
+
+        <a
+            href="{% url 'compteur:deconnexion' %}"
+            class="flex items-center gap-3 p-3 rounded-lg
+                   bg-red-500/10 text-red-400 hover:bg-red-500/20"
+        >
+
+            <i data-lucide="log-out"></i>
+
+            Déconnexion
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+<!-- CONTENU -->
+
+<div class="lg:ml-64 min-h-screen">
+
+
+    <!-- HEADER -->
+
+    <header
+        class="bg-white border-b border-slate-200
+               px-4 md:px-6 py-4
+               flex items-center justify-between"
+    >
+
+        <button
+            id="menuButton"
+            class="lg:hidden p-2 rounded-lg hover:bg-slate-100"
+        >
+
+            <i data-lucide="menu"></i>
+
+        </button>
+
+
+        <div class="ml-auto flex items-center gap-3">
+
+            <div class="text-right">
+
+                <p class="font-semibold">
+                    {{ request.user.username }}
+                </p>
+
+                <p class="text-xs text-slate-500">
+
+                    {% if request.user.is_staff %}
+                        Administrateur
+                    {% else %}
+                        Client
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- PAGE -->
+
+    <main class="p-4 md:p-6">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</div>
+
+
+<script src="{% static 'compteur/js/app.js' %}"></script>
+
+</body>
+
+</html>

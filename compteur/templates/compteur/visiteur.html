@@ -1,0 +1,2037 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Gestion Électricité | Compteur intelligent
+    </title>
+
+    <!-- =====================================================
+         TAILWIND CSS
+    ====================================================== -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- =====================================================
+         LUCIDE ICONS
+    ====================================================== -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- =====================================================
+         COULEURS DU PROJET
+    ====================================================== -->
+    <style>
+
+        :root {
+
+            --blue: #2563eb;
+            --blue-light: #dbeafe;
+
+            --green: #16a34a;
+            --green-light: #dcfce7;
+
+            --orange: #f59e0b;
+            --orange-light: #fef3c7;
+
+            --purple: #7c3aed;
+            --purple-light: #ede9fe;
+
+            --red: #dc2626;
+            --red-light: #fee2e2;
+
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+
+            --dark: #0f172a;
+
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #ffffff;
+            color: var(--dark);
+        }
+
+        .hero-grid {
+
+            background-image:
+                linear-gradient(
+                    rgba(37, 99, 235, 0.035) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(37, 99, 235, 0.035) 1px,
+                    transparent 1px
+                );
+
+            background-size: 40px 40px;
+
+        }
+
+        .shadow-soft {
+            box-shadow:
+                0 10px 30px rgba(15, 23, 42, 0.07);
+        }
+
+        .shadow-blue {
+            box-shadow:
+                0 12px 30px rgba(37, 99, 235, 0.15);
+        }
+
+        /* =====================================================
+           IMAGE ÉNERGIE + NATURE
+        ====================================================== */
+
+        .image-energie {
+            transition:
+                transform 0.5s ease,
+                filter 0.5s ease;
+        }
+
+        .image-energie:hover {
+            transform: scale(1.03);
+            filter: brightness(1.05);
+        }
+
+    </style>
+
+</head>
+
+
+<body class="bg-white text-slate-900">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="fixed top-0 left-0 right-0 z-50
+               bg-white/95 backdrop-blur-md
+               border-b border-slate-200">
+
+    <div class="max-w-7xl mx-auto
+                px-5 sm:px-6 lg:px-8">
+
+        <div class="h-16
+                    flex items-center
+                    justify-between">
+
+
+            <!-- LOGO -->
+
+            <a href="{% url 'compteur:visiteur' %}"
+               class="flex items-center gap-3">
+
+                <div class="w-10 h-10
+                            rounded-xl
+                            bg-blue-600
+                            flex items-center justify-center
+                            shadow-blue">
+
+                    <i data-lucide="zap"
+                       class="w-5 h-5 text-white">
+                    </i>
+
+                </div>
+
+
+                <div>
+
+                    <div class="font-bold
+                                text-slate-900
+                                leading-tight">
+
+                        Gestion Électricité
+
+                    </div>
+
+                    <div class="text-xs
+                                text-slate-500">
+
+                        Compteur intelligent
+
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <!-- NAVIGATION -->
+
+            <nav class="hidden md:flex
+                        items-center gap-8
+                        text-sm">
+
+                <a href="#fonctionnement"
+                   class="text-slate-600
+                          hover:text-blue-600
+                          transition">
+
+                    Fonctionnement
+
+                </a>
+
+
+                <a href="#fonctionnalites"
+                   class="text-slate-600
+                          hover:text-blue-600
+                          transition">
+
+                    Fonctionnalités
+
+                </a>
+
+
+                <a href="#securite"
+                   class="text-slate-600
+                          hover:text-blue-600
+                          transition">
+
+                    Sécurité
+
+                </a>
+
+            </nav>
+
+
+            <!-- CONNEXION -->
+
+            <a href="{% url 'compteur:connexion' %}"
+               class="inline-flex items-center
+                      gap-2
+                      px-4 py-2
+                      rounded-xl
+                      bg-blue-600
+                      hover:bg-blue-700
+                      text-white
+                      transition
+                      font-semibold
+                      text-sm
+                      shadow-blue">
+
+                <i data-lucide="log-in"
+                   class="w-4 h-4">
+                </i>
+
+                Connexion
+
+            </a>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="relative
+                pt-32 pb-20
+                overflow-hidden
+                hero-grid">
+
+
+    <!-- LUMIÈRES -->
+
+    <div class="absolute
+                top-20
+                left-1/4
+                w-72 h-72
+                bg-blue-100
+                rounded-full
+                blur-3xl
+                opacity-50
+                pointer-events-none">
+    </div>
+
+
+    <div class="absolute
+                bottom-0
+                right-1/4
+                w-64 h-64
+                bg-green-100
+                rounded-full
+                blur-3xl
+                opacity-50
+                pointer-events-none">
+    </div>
+
+
+    <div class="relative
+                max-w-7xl mx-auto
+                px-5 sm:px-6 lg:px-8">
+
+
+        <div class="grid lg:grid-cols-2
+                    gap-14
+                    items-center">
+
+
+            <!-- =================================================
+                 TEXTE HERO
+            ================================================== -->
+
+            <div>
+
+
+                <!-- BADGE -->
+
+                <div class="inline-flex
+                            items-center gap-2
+                            px-3 py-1.5
+                            rounded-full
+                            bg-blue-50
+                            border border-blue-100
+                            text-blue-700
+                            text-sm
+                            font-medium
+                            mb-6">
+
+                    <span class="w-2 h-2
+                                 rounded-full
+                                 bg-green-500">
+                    </span>
+
+                    Système connecté et intelligent
+
+                </div>
+
+
+                <!-- TITRE -->
+
+                <h1 class="text-4xl
+                           sm:text-5xl
+                           lg:text-6xl
+                           font-bold
+                           tracking-tight
+                           leading-tight
+                           text-slate-900">
+
+                    Gérez votre électricité
+
+                    <span class="text-blue-600">
+                        simplement.
+                    </span>
+
+                </h1>
+
+
+                <!-- DESCRIPTION -->
+
+                <p class="mt-6
+                          text-lg
+                          text-slate-600
+                          leading-relaxed
+                          max-w-xl">
+
+                    Une solution intelligente pour surveiller
+                    votre compteur électrique, suivre votre
+                    consommation, gérer votre solde énergétique
+                    et contrôler automatiquement votre
+                    alimentation.
+
+                </p>
+
+
+                <!-- BOUTONS -->
+
+                <div class="mt-8
+                            flex flex-col
+                            sm:flex-row
+                            gap-4">
+
+
+                    <a href="{% url 'compteur:connexion' %}"
+                       class="inline-flex
+                              items-center
+                              justify-center
+                              gap-2
+                              px-6 py-3.5
+                              rounded-xl
+                              bg-blue-600
+                              hover:bg-blue-700
+                              text-white
+                              font-bold
+                              transition
+                              shadow-blue">
+
+                        Accéder à mon espace
+
+                        <i data-lucide="arrow-right"
+                           class="w-5 h-5">
+                        </i>
+
+                    </a>
+
+
+                    <a href="#fonctionnement"
+                       class="inline-flex
+                              items-center
+                              justify-center
+                              gap-2
+                              px-6 py-3.5
+                              rounded-xl
+                              border
+                              border-slate-200
+                              bg-white
+                              hover:bg-slate-50
+                              text-slate-700
+                              font-semibold
+                              transition
+                              shadow-sm">
+
+                        Découvrir le système
+
+                        <i data-lucide="chevron-down"
+                           class="w-5 h-5">
+                        </i>
+
+                    </a>
+
+                </div>
+
+
+                <!-- TECHNOLOGIES -->
+
+                <div class="mt-10
+                            flex flex-wrap gap-3">
+
+
+                    <span class="px-3 py-1.5
+                                 rounded-lg
+                                 bg-blue-50
+                                 text-blue-700
+                                 text-xs
+                                 font-medium">
+
+                        ESP32
+
+                    </span>
+
+
+                    <span class="px-3 py-1.5
+                                 rounded-lg
+                                 bg-green-50
+                                 text-green-700
+                                 text-xs
+                                 font-medium">
+
+                        PZEM-004T
+
+                    </span>
+
+
+                    <span class="px-3 py-1.5
+                                 rounded-lg
+                                 bg-purple-50
+                                 text-purple-700
+                                 text-xs
+                                 font-medium">
+
+                        Django
+
+                    </span>
+
+
+                    <span class="px-3 py-1.5
+                                 rounded-lg
+                                 bg-orange-50
+                                 text-orange-700
+                                 text-xs
+                                 font-medium">
+
+                        Temps réel
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 COMPTEUR VISUEL
+            ================================================== -->
+
+            <div class="relative">
+
+
+                <div class="absolute
+                            -inset-5
+                            bg-blue-100
+                            blur-3xl
+                            rounded-full
+                            opacity-60">
+                </div>
+
+
+                <div class="relative
+                            bg-white
+                            rounded-3xl
+                            border
+                            border-slate-200
+                            shadow-soft
+                            overflow-hidden">
+
+
+                    <!-- BARRE COMPTEUR -->
+
+                    <div class="px-5 py-4
+                                border-b
+                                border-slate-100
+                                flex items-center
+                                justify-between">
+
+
+                        <div class="flex items-center gap-3">
+
+
+                            <div class="w-10 h-10
+                                        rounded-xl
+                                        bg-blue-50
+                                        flex items-center
+                                        justify-center">
+
+                                <i data-lucide="gauge"
+                                   class="w-5 h-5
+                                          text-blue-600">
+                                </i>
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="font-semibold
+                                            text-slate-900">
+
+                                    Compteur Maison
+
+                                </div>
+
+                                <div class="text-xs
+                                            text-slate-500">
+
+                                    COMPTEUR_01
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="flex items-center
+                                    gap-2
+                                    text-xs
+                                    text-green-600">
+
+                            <span class="w-2 h-2
+                                         rounded-full
+                                         bg-green-500">
+                            </span>
+
+                            ESP32 en ligne
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONTENU -->
+
+                    <div class="p-6">
+
+
+                        <!-- SOLDE -->
+
+                        <div class="text-sm
+                                    text-slate-500">
+
+                            Solde énergétique
+
+                        </div>
+
+
+                        <div class="mt-2
+                                    flex items-end gap-2">
+
+                            <span class="text-5xl
+                                         font-bold
+                                         tracking-tight
+                                         text-slate-900">
+
+                                100.000
+
+                            </span>
+
+                            <span class="text-slate-500 mb-2">
+
+                                kWh
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- BARRE SOLDE -->
+
+                        <div class="mt-5">
+
+                            <div class="h-2
+                                        rounded-full
+                                        bg-slate-100
+                                        overflow-hidden">
+
+                                <div class="h-full
+                                            w-[82%]
+                                            bg-green-500
+                                            rounded-full">
+                                </div>
+
+                            </div>
+
+
+                            <div class="mt-2
+                                        flex justify-between
+                                        text-xs
+                                        text-slate-500">
+
+                                <span>
+                                    Solde disponible
+                                </span>
+
+                                <span class="text-green-600
+                                             font-medium">
+
+                                    82%
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- MESURES -->
+
+                        <div class="grid
+                                    grid-cols-2
+                                    gap-3
+                                    mt-6">
+
+
+                            <!-- TENSION -->
+
+                            <div class="p-4
+                                        rounded-2xl
+                                        bg-blue-50
+                                        border
+                                        border-blue-100">
+
+                                <div class="flex
+                                            items-center
+                                            gap-2
+                                            text-blue-600
+                                            text-xs">
+
+                                    <i data-lucide="zap"
+                                       class="w-4 h-4">
+                                    </i>
+
+                                    Tension
+
+                                </div>
+
+
+                                <div class="mt-2
+                                            text-xl
+                                            font-bold
+                                            text-slate-900">
+
+                                    210.7 V
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PUISSANCE -->
+
+                            <div class="p-4
+                                        rounded-2xl
+                                        bg-orange-50
+                                        border
+                                        border-orange-100">
+
+                                <div class="flex
+                                            items-center
+                                            gap-2
+                                            text-orange-600
+                                            text-xs">
+
+                                    <i data-lucide="activity"
+                                       class="w-4 h-4">
+                                    </i>
+
+                                    Puissance
+
+                                </div>
+
+
+                                <div class="mt-2
+                                            text-xl
+                                            font-bold
+                                            text-slate-900">
+
+                                    12.1 W
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- COURANT -->
+
+                            <div class="p-4
+                                        rounded-2xl
+                                        bg-purple-50
+                                        border
+                                        border-purple-100">
+
+                                <div class="flex
+                                            items-center
+                                            gap-2
+                                            text-purple-600
+                                            text-xs">
+
+                                    <i data-lucide="waves"
+                                       class="w-4 h-4">
+                                    </i>
+
+                                    Courant
+
+                                </div>
+
+
+                                <div class="mt-2
+                                            text-xl
+                                            font-bold
+                                            text-slate-900">
+
+                                    0.091 A
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CONTACTEUR -->
+
+                            <div class="p-4
+                                        rounded-2xl
+                                        bg-green-50
+                                        border
+                                        border-green-100">
+
+                                <div class="flex
+                                            items-center
+                                            gap-2
+                                            text-green-600
+                                            text-xs">
+
+                                    <i data-lucide="power"
+                                       class="w-4 h-4">
+                                    </i>
+
+                                    Contacteur
+
+                                </div>
+
+
+                                <div class="mt-2
+                                            text-xl
+                                            font-bold
+                                            text-green-600">
+
+                                    ON
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BAS COMPTEUR -->
+
+                    <div class="px-6 py-4
+                                bg-slate-50
+                                border-t
+                                border-slate-100
+                                flex items-center
+                                justify-between">
+
+                        <span class="text-xs
+                                     text-slate-500">
+
+                            Système de surveillance
+
+                        </span>
+
+
+                        <span class="text-xs
+                                     text-green-600
+                                     font-medium">
+
+                            ● Fonctionnement normal
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FONCTIONNALITÉS
+========================================================= -->
+
+<section id="fonctionnalites"
+         class="py-20
+                bg-slate-50
+                border-y
+                border-slate-100">
+
+
+    <div class="max-w-7xl mx-auto
+                px-5 sm:px-6 lg:px-8">
+
+
+        <!-- TITRE -->
+
+        <div class="max-w-2xl">
+
+
+            <div class="text-blue-600
+                        text-sm
+                        font-semibold
+                        uppercase
+                        tracking-wider">
+
+                Fonctionnalités
+
+            </div>
+
+
+            <h2 class="mt-3
+                       text-3xl
+                       sm:text-4xl
+                       font-bold
+                       text-slate-900">
+
+                Tout contrôler depuis votre espace
+
+            </h2>
+
+
+            <p class="mt-4
+                      text-slate-600">
+
+                Le système centralise les informations de votre
+                compteur et vous permet de suivre votre
+                consommation électrique.
+
+            </p>
+
+        </div>
+
+
+        <!-- CARTES -->
+
+        <div class="grid
+                    sm:grid-cols-2
+                    lg:grid-cols-4
+                    gap-5
+                    mt-10">
+
+
+            <!-- TEMPS RÉEL -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft
+                        hover:-translate-y-1
+                        transition">
+
+
+                <div class="w-11 h-11
+                            rounded-xl
+                            bg-blue-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="radio"
+                       class="w-5 h-5
+                              text-blue-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Temps réel
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500
+                          leading-relaxed">
+
+                    Visualisez l'état du compteur et les dernières
+                    mesures envoyées par l'ESP32.
+
+                </p>
+
+            </div>
+
+
+            <!-- SOLDE -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft
+                        hover:-translate-y-1
+                        transition">
+
+
+                <div class="w-11 h-11
+                            rounded-xl
+                            bg-green-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="wallet"
+                       class="w-5 h-5
+                              text-green-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Solde énergétique
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500
+                          leading-relaxed">
+
+                    Suivez votre solde en kWh et les mouvements
+                    de recharge et de consommation.
+
+                </p>
+
+            </div>
+
+
+            <!-- CONSOMMATION -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft
+                        hover:-translate-y-1
+                        transition">
+
+
+                <div class="w-11 h-11
+                            rounded-xl
+                            bg-purple-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="bar-chart-3"
+                       class="w-5 h-5
+                              text-purple-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Consommation
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500
+                          leading-relaxed">
+
+                    Consultez l'évolution de votre consommation
+                    électrique et les mesures enregistrées.
+
+                </p>
+
+            </div>
+
+
+            <!-- CONTRÔLE -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft
+                        hover:-translate-y-1
+                        transition">
+
+
+                <div class="w-11 h-11
+                            rounded-xl
+                            bg-orange-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="power"
+                       class="w-5 h-5
+                              text-orange-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Contrôle
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500
+                          leading-relaxed">
+
+                    Le système peut contrôler automatiquement
+                    le contacteur selon l'autorisation et le solde.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FONCTIONNEMENT
+========================================================= -->
+
+<section id="fonctionnement"
+         class="py-20">
+
+
+    <div class="max-w-7xl mx-auto
+                px-5 sm:px-6 lg:px-8">
+
+
+        <!-- TITRE -->
+
+        <div class="text-center
+                    max-w-2xl
+                    mx-auto">
+
+
+            <div class="text-blue-600
+                        text-sm
+                        font-semibold
+                        uppercase
+                        tracking-wider">
+
+                Fonctionnement
+
+            </div>
+
+
+            <h2 class="mt-3
+                       text-3xl
+                       sm:text-4xl
+                       font-bold
+                       text-slate-900">
+
+                Une chaîne simple et automatisée
+
+            </h2>
+
+
+            <p class="mt-4
+                      text-slate-600">
+
+                Le compteur communique avec le serveur pour
+                transmettre les mesures et appliquer les règles
+                de fonctionnement.
+
+            </p>
+
+        </div>
+
+
+        <!-- ÉTAPES -->
+
+        <div class="grid
+                    md:grid-cols-4
+                    gap-6
+                    mt-12">
+
+
+            <!-- 01 -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft">
+
+
+                <div class="text-blue-600
+                            text-sm
+                            font-bold">
+
+                    01
+
+                </div>
+
+
+                <div class="mt-4
+                            w-12 h-12
+                            rounded-xl
+                            bg-blue-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="gauge"
+                       class="w-6 h-6
+                              text-blue-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Mesure
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500">
+
+                    Le PZEM-004T mesure la tension,
+                    le courant, la puissance et l'énergie.
+
+                </p>
+
+            </div>
+
+
+            <!-- 02 -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft">
+
+
+                <div class="text-green-600
+                            text-sm
+                            font-bold">
+
+                    02
+
+                </div>
+
+
+                <div class="mt-4
+                            w-12 h-12
+                            rounded-xl
+                            bg-green-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="wifi"
+                       class="w-6 h-6
+                              text-green-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Transmission
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500">
+
+                    L'ESP32 transmet les données au serveur
+                    Django via le réseau Wi-Fi.
+
+                </p>
+
+            </div>
+
+
+            <!-- 03 -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft">
+
+
+                <div class="text-purple-600
+                            text-sm
+                            font-bold">
+
+                    03
+
+                </div>
+
+
+                <div class="mt-4
+                            w-12 h-12
+                            rounded-xl
+                            bg-purple-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="server"
+                       class="w-6 h-6
+                              text-purple-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Analyse
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500">
+
+                    Django enregistre les mesures et vérifie
+                    l'état du compteur et du solde.
+
+                </p>
+
+            </div>
+
+
+            <!-- 04 -->
+
+            <div class="p-6
+                        rounded-2xl
+                        bg-white
+                        border
+                        border-slate-200
+                        shadow-soft">
+
+
+                <div class="text-orange-600
+                            text-sm
+                            font-bold">
+
+                    04
+
+                </div>
+
+
+                <div class="mt-4
+                            w-12 h-12
+                            rounded-xl
+                            bg-orange-50
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="power"
+                       class="w-6 h-6
+                              text-orange-600">
+                    </i>
+
+                </div>
+
+
+                <h3 class="mt-5
+                           font-semibold
+                           text-lg">
+
+                    Contrôle
+
+                </h3>
+
+
+                <p class="mt-2
+                          text-sm
+                          text-slate-500">
+
+                    Le système peut commander le contacteur
+                    selon les conditions configurées.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     SÉCURITÉ
+========================================================= -->
+
+<section id="securite"
+         class="py-20
+                bg-slate-50
+                border-y
+                border-slate-100">
+
+
+    <div class="max-w-7xl mx-auto
+                px-5 sm:px-6 lg:px-8">
+
+
+        <div class="grid
+                    lg:grid-cols-2
+                    gap-12
+                    items-center">
+
+
+            <!-- TEXTE -->
+
+            <div>
+
+
+                <div class="inline-flex
+                            items-center gap-2
+                            text-green-600
+                            text-sm
+                            font-semibold">
+
+                    <i data-lucide="shield-check"
+                       class="w-5 h-5">
+                    </i>
+
+                    Sécurité et contrôle
+
+                </div>
+
+
+                <h2 class="mt-4
+                           text-3xl
+                           sm:text-4xl
+                           font-bold
+                           text-slate-900">
+
+                    Une gestion basée sur
+                    des règles claires
+
+                </h2>
+
+
+                <p class="mt-5
+                          text-slate-600
+                          leading-relaxed">
+
+                    Le système distingue l'autorisation du compteur
+                    et l'état physique du contacteur. Cela permet
+                    d'appliquer les règles de sécurité avant toute
+                    commande électrique.
+
+                </p>
+
+
+                <div class="mt-7
+                            space-y-5">
+
+
+                    <!-- AUTORISATION -->
+
+                    <div class="flex gap-4">
+
+
+                        <div class="w-9 h-9
+                                    shrink-0
+                                    rounded-lg
+                                    bg-green-100
+                                    flex items-center
+                                    justify-center">
+
+                            <i data-lucide="check"
+                               class="w-5 h-5
+                                      text-green-600">
+                            </i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="font-semibold
+                                        text-slate-900">
+
+                                Autorisation contrôlée
+
+                            </div>
+
+
+                            <div class="text-sm
+                                        text-slate-500
+                                        mt-1">
+
+                                Le compteur peut être autorisé
+                                ou désactivé par l'administration.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SOLDE -->
+
+                    <div class="flex gap-4">
+
+
+                        <div class="w-9 h-9
+                                    shrink-0
+                                    rounded-lg
+                                    bg-blue-100
+                                    flex items-center
+                                    justify-center">
+
+                            <i data-lucide="wallet"
+                               class="w-5 h-5
+                                      text-blue-600">
+                            </i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="font-semibold
+                                        text-slate-900">
+
+                                Gestion du solde
+
+                            </div>
+
+
+                            <div class="text-sm
+                                        text-slate-500
+                                        mt-1">
+
+                                La consommation est déduite
+                                du solde énergétique enregistré.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COUPURE -->
+
+                    <div class="flex gap-4">
+
+
+                        <div class="w-9 h-9
+                                    shrink-0
+                                    rounded-lg
+                                    bg-red-100
+                                    flex items-center
+                                    justify-center">
+
+                            <i data-lucide="power-off"
+                               class="w-5 h-5
+                                      text-red-600">
+                            </i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="font-semibold
+                                        text-slate-900">
+
+                                Coupure automatique
+
+                            </div>
+
+
+                            <div class="text-sm
+                                        text-slate-500
+                                        mt-1">
+
+                                Le système peut désactiver
+                                le contacteur lorsque les
+                                conditions de coupure sont atteintes.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 IMAGE + ÉTAT DU SYSTÈME
+            ================================================== -->
+
+            <div class="space-y-5">
+
+
+                <!-- IMAGE ÉNERGIE + NATURE -->
+
+                <div class="relative
+                            overflow-hidden
+                            rounded-3xl
+                            border
+                            border-slate-200
+                            bg-white
+                            shadow-soft">
+
+
+                    <img
+                        src="https://images.pexels.com/photos/2788392/pexels-photo-2788392.jpeg?cs=srgb&dl=pexels-byron-martinez-1344378-2788392.jpg&fm=jpg"
+                        alt="Ampoule lumineuse entourée de feuilles"
+                        class="image-energie
+                               w-full
+                               h-80
+                               object-cover">
+
+
+                    <!-- DÉGRADÉ -->
+
+                    <div class="absolute
+                                inset-0
+                                bg-gradient-to-t
+                                from-slate-950/70
+                                via-transparent
+                                to-transparent
+                                pointer-events-none">
+                    </div>
+
+
+                    <!-- TEXTE SUR IMAGE -->
+
+                    <div class="absolute
+                                bottom-0
+                                left-0
+                                right-0
+                                p-6">
+
+
+                        <div class="inline-flex
+                                    items-center
+                                    gap-2
+                                    px-3
+                                    py-1.5
+                                    rounded-full
+                                    bg-white/95
+                                    text-green-700
+                                    text-xs
+                                    font-semibold
+                                    shadow">
+
+                            <i data-lucide="leaf"
+                               class="w-4 h-4">
+                            </i>
+
+                            Énergie intelligente
+
+                        </div>
+
+
+                        <h3 class="mt-3
+                                   text-2xl
+                                   font-bold
+                                   text-white">
+
+                            Une énergie mieux maîtrisée
+
+                        </h3>
+
+
+                        <p class="mt-1
+                                  text-sm
+                                  text-white/85">
+
+                            Surveillez et contrôlez votre consommation
+                            électrique avec une solution connectée.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CARTE ÉTAT -->
+
+                <div class="rounded-3xl
+                            border
+                            border-slate-200
+                            bg-white
+                            p-7
+                            shadow-soft">
+
+
+                    <div class="flex items-center
+                                justify-between">
+
+
+                        <div>
+
+                            <div class="text-sm
+                                        text-slate-500">
+
+                                État du système
+
+                            </div>
+
+
+                            <div class="mt-1
+                                        text-2xl
+                                        font-bold
+                                        text-slate-900">
+
+                                Fonctionnement normal
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="w-14 h-14
+                                    rounded-2xl
+                                    bg-green-50
+                                    flex items-center
+                                    justify-center">
+
+                            <i data-lucide="shield-check"
+                               class="w-7 h-7
+                                      text-green-600">
+                            </i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-7
+                                space-y-3">
+
+
+                        <!-- ESP32 -->
+
+                        <div class="flex items-center
+                                    justify-between
+                                    p-4
+                                    rounded-xl
+                                    bg-slate-50">
+
+                            <span class="text-sm
+                                         text-slate-500">
+
+                                ESP32
+
+                            </span>
+
+
+                            <span class="text-sm
+                                         text-green-600
+                                         font-medium">
+
+                                ● Connecté
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- AUTORISATION -->
+
+                        <div class="flex items-center
+                                    justify-between
+                                    p-4
+                                    rounded-xl
+                                    bg-slate-50">
+
+                            <span class="text-sm
+                                         text-slate-500">
+
+                                Autorisation
+
+                            </span>
+
+
+                            <span class="text-sm
+                                         text-green-600
+                                         font-medium">
+
+                                Active
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- CONTACTEUR -->
+
+                        <div class="flex items-center
+                                    justify-between
+                                    p-4
+                                    rounded-xl
+                                    bg-slate-50">
+
+                            <span class="text-sm
+                                         text-slate-500">
+
+                                Contacteur
+
+                            </span>
+
+
+                            <span class="text-sm
+                                         text-green-600
+                                         font-medium">
+
+                                ON
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- COMMUNICATION -->
+
+                        <div class="flex items-center
+                                    justify-between
+                                    p-4
+                                    rounded-xl
+                                    bg-slate-50">
+
+                            <span class="text-sm
+                                         text-slate-500">
+
+                                Communication
+
+                            </span>
+
+
+                            <span class="text-sm
+                                         text-green-600
+                                         font-medium">
+
+                                Opérationnelle
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CTA
+========================================================= -->
+
+<section class="py-20">
+
+
+    <div class="max-w-5xl mx-auto
+                px-5 sm:px-6 lg:px-8">
+
+
+        <div class="relative
+                    overflow-hidden
+                    rounded-3xl
+                    bg-blue-600
+                    p-8 sm:p-12
+                    text-center
+                    shadow-blue">
+
+
+            <div class="absolute
+                        top-0
+                        left-1/2
+                        -translate-x-1/2
+                        w-72 h-40
+                        bg-blue-500
+                        rounded-full
+                        blur-3xl
+                        opacity-40">
+            </div>
+
+
+            <div class="relative">
+
+
+                <div class="mx-auto
+                            w-14 h-14
+                            rounded-2xl
+                            bg-white
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="zap"
+                       class="w-7 h-7
+                              text-blue-600">
+                    </i>
+
+                </div>
+
+
+                <h2 class="mt-6
+                           text-3xl
+                           sm:text-4xl
+                           font-bold
+                           text-white">
+
+                    Accédez à votre espace
+
+                </h2>
+
+
+                <p class="mt-4
+                          text-blue-100
+                          max-w-xl
+                          mx-auto">
+
+                    Consultez vos compteurs, votre solde,
+                    votre consommation et les mesures
+                    en temps réel.
+
+                </p>
+
+
+                <a href="{% url 'compteur:connexion' %}"
+                   class="mt-8
+                          inline-flex
+                          items-center
+                          justify-center
+                          gap-2
+                          px-7 py-3.5
+                          rounded-xl
+                          bg-white
+                          hover:bg-slate-100
+                          text-blue-700
+                          font-bold
+                          transition">
+
+                    Se connecter
+
+                    <i data-lucide="arrow-right"
+                       class="w-5 h-5">
+                    </i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="border-t
+               border-slate-200
+               bg-white">
+
+
+    <div class="max-w-7xl mx-auto
+                px-5 sm:px-6 lg:px-8
+                py-8">
+
+
+        <div class="flex
+                    flex-col
+                    sm:flex-row
+                    items-center
+                    justify-between
+                    gap-4">
+
+
+            <div class="flex items-center gap-3">
+
+
+                <div class="w-9 h-9
+                            rounded-lg
+                            bg-blue-600
+                            flex items-center
+                            justify-center">
+
+                    <i data-lucide="zap"
+                       class="w-5 h-5
+                              text-white">
+                    </i>
+
+                </div>
+
+
+                <div>
+
+                    <div class="font-semibold
+                                text-slate-900">
+
+                        Gestion Électricité
+
+                    </div>
+
+
+                    <div class="text-xs
+                                text-slate-500">
+
+                        Système de compteur intelligent
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="text-sm
+                        text-slate-500">
+
+                © {% now "Y" %}
+                Gestion Électricité
+
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     LUCIDE
+========================================================= -->
+
+<script>
+
+    lucide.createIcons();
+
+</script>
+
+
+</body>
+
+</html>

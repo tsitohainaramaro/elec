@@ -1,0 +1,535 @@
+{% extends "compteur/base.html" %}
+{% load static %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block content %}
+
+<div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+
+        <div class="flex items-center gap-3">
+
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+                <i data-lucide="user-round" class="h-6 w-6"></i>
+            </div>
+
+            <div>
+
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900">
+                    Mon profil
+                </h1>
+
+                <p class="mt-1 text-sm text-gray-500">
+                    Consultez et mettez à jour vos informations personnelles.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if not profil %}
+
+    <!-- PROFIL NON CRÉÉ -->
+    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+
+        <div class="flex items-start gap-3">
+
+            <i data-lucide="triangle-alert" class="mt-0.5 h-5 w-5 shrink-0 text-amber-600"></i>
+
+            <div>
+
+                <h2 class="font-bold text-amber-900">
+                    Profil non disponible
+                </h2>
+
+                <p class="mt-1 text-sm text-amber-700">
+                    Aucun profil client n'est actuellement associé à ce compte.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+
+    <!-- CONTENU -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+
+        <!-- CARTE PROFIL -->
+        <div class="lg:col-span-1">
+
+            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+                <div class="h-24 bg-gradient-to-r from-emerald-500 to-green-500"></div>
+
+                <div class="px-6 pb-6">
+
+                    <!-- PHOTO -->
+                    <div class="-mt-12 flex justify-center">
+
+                        {% if profil.photo_user %}
+
+                        <img
+                            src="{{ profil.photo_user.url }}"
+                            alt="Photo de profil"
+                            class="h-24 w-24 rounded-2xl border-4 border-white object-cover shadow-md"
+                        >
+
+                        {% else %}
+
+                        <div class="flex h-24 w-24 items-center justify-center rounded-2xl border-4 border-white bg-gray-100 text-gray-400 shadow-md">
+                            <i data-lucide="user" class="h-10 w-10"></i>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- NOM -->
+                    <div class="mt-4 text-center">
+
+                        <h2 class="text-xl font-bold text-gray-900">
+                            {{ profil.prenom }} {{ profil.nom }}
+                        </h2>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            @{{ request.user.username }}
+                        </p>
+
+                    </div>
+
+
+                    <!-- STATUT -->
+                    <div class="mt-5 flex justify-center">
+
+                        {% if profil.actif %}
+
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                            Compte actif
+                        </span>
+
+                        {% else %}
+
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                            Compte inactif
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- VERIFICATIONS -->
+                    <div class="mt-6 border-t border-gray-100 pt-5">
+
+                        <p class="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">
+                            Vérifications
+                        </p>
+
+
+                        <div class="space-y-3">
+
+                            <!-- EMAIL -->
+                            <div class="flex items-center justify-between">
+
+                                <span class="flex items-center gap-2 text-sm text-gray-600">
+                                    <i data-lucide="mail" class="h-4 w-4"></i>
+                                    Email
+                                </span>
+
+                                {% if profil.email_verifiee %}
+
+                                <span class="text-xs font-bold text-emerald-600">
+                                    Vérifié
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-xs font-semibold text-gray-400">
+                                    Non vérifié
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- TELEPHONE -->
+                            <div class="flex items-center justify-between">
+
+                                <span class="flex items-center gap-2 text-sm text-gray-600">
+                                    <i data-lucide="phone" class="h-4 w-4"></i>
+                                    Téléphone
+                                </span>
+
+                                {% if profil.telephone_verifie %}
+
+                                <span class="text-xs font-bold text-emerald-600">
+                                    Vérifié
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-xs font-semibold text-gray-400">
+                                    Non vérifié
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- CIN -->
+                            <div class="flex items-center justify-between">
+
+                                <span class="flex items-center gap-2 text-sm text-gray-600">
+                                    <i data-lucide="badge-check" class="h-4 w-4"></i>
+                                    CIN
+                                </span>
+
+                                {% if profil.cin_verifiee %}
+
+                                <span class="text-xs font-bold text-emerald-600">
+                                    Vérifiée
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-xs font-semibold text-gray-400">
+                                    Non vérifiée
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FORMULAIRE -->
+        <div class="lg:col-span-2">
+
+            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+                <div class="border-b border-gray-100 px-6 py-5">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                            <i data-lucide="user-pen" class="h-5 w-5"></i>
+                        </div>
+
+                        <div>
+
+                            <h2 class="text-base font-bold text-gray-900">
+                                Informations personnelles
+                            </h2>
+
+                            <p class="mt-1 text-xs text-gray-500">
+                                Modifiez vos informations puis enregistrez.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <form method="post" class="p-6">
+
+                    {% csrf_token %}
+
+
+                    <!-- IDENTITE -->
+                    <div class="mb-6">
+
+                        <h3 class="mb-4 text-sm font-bold text-gray-900">
+                            Identité
+                        </h3>
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                            <!-- PRENOM -->
+                            <div>
+
+                                <label
+                                    for="prenom"
+                                    class="mb-2 block text-sm font-semibold text-gray-700"
+                                >
+                                    Prénom
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="prenom"
+                                    name="prenom"
+                                    value="{{ profil.prenom }}"
+                                    class="h-12 w-full rounded-xl border border-gray-300 px-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                >
+
+                            </div>
+
+
+                            <!-- NOM -->
+                            <div>
+
+                                <label
+                                    for="nom"
+                                    class="mb-2 block text-sm font-semibold text-gray-700"
+                                >
+                                    Nom
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="nom"
+                                    name="nom"
+                                    value="{{ profil.nom }}"
+                                    class="h-12 w-full rounded-xl border border-gray-300 px-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONTACT -->
+                    <div class="mb-6 border-t border-gray-100 pt-6">
+
+                        <h3 class="mb-4 text-sm font-bold text-gray-900">
+                            Contact
+                        </h3>
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                            <!-- TELEPHONE -->
+                            <div>
+
+                                <label
+                                    for="telephone"
+                                    class="mb-2 block text-sm font-semibold text-gray-700"
+                                >
+                                    Téléphone
+                                </label>
+
+                                <div class="relative">
+
+                                    <i
+                                        data-lucide="phone"
+                                        class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                                    ></i>
+
+                                    <input
+                                        type="text"
+                                        id="telephone"
+                                        name="telephone"
+                                        value="{{ profil.telephone }}"
+                                        class="h-12 w-full rounded-xl border border-gray-300 pl-11 pr-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+                            <div>
+
+                                <label
+                                    for="email"
+                                    class="mb-2 block text-sm font-semibold text-gray-700"
+                                >
+                                    Email
+                                </label>
+
+                                <div class="relative">
+
+                                    <i
+                                        data-lucide="mail"
+                                        class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                                    ></i>
+
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value="{{ request.user.email }}"
+                                        class="h-12 w-full rounded-xl border border-gray-300 pl-11 pr-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOCALISATION -->
+                    <div class="mb-6 border-t border-gray-100 pt-6">
+
+                        <h3 class="mb-4 text-sm font-bold text-gray-900">
+                            Adresse
+                        </h3>
+
+                        <div class="space-y-4">
+
+                            <!-- ADRESSE -->
+                            <div>
+
+                                <label
+                                    for="adresse"
+                                    class="mb-2 block text-sm font-semibold text-gray-700"
+                                >
+                                    Adresse
+                                </label>
+
+                                <textarea
+                                    id="adresse"
+                                    name="adresse"
+                                    rows="3"
+                                    class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                >{{ profil.adresse }}</textarea>
+
+                            </div>
+
+
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                                <!-- VILLE -->
+                                <div>
+
+                                    <label
+                                        for="ville"
+                                        class="mb-2 block text-sm font-semibold text-gray-700"
+                                    >
+                                        Ville
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="ville"
+                                        name="ville"
+                                        value="{{ profil.ville }}"
+                                        class="h-12 w-full rounded-xl border border-gray-300 px-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                    >
+
+                                </div>
+
+
+                                <!-- FOKONTANY -->
+                                <div>
+
+                                    <label
+                                        for="fokontany"
+                                        class="mb-2 block text-sm font-semibold text-gray-700"
+                                    >
+                                        Fokontany
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="fokontany"
+                                        name="fokontany"
+                                        value="{{ profil.fokontany }}"
+                                        class="h-12 w-full rounded-xl border border-gray-300 px-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PROFESSION -->
+                    <div class="border-t border-gray-100 pt-6">
+
+                        <h3 class="mb-4 text-sm font-bold text-gray-900">
+                            Informations complémentaires
+                        </h3>
+
+                        <label
+                            for="profession"
+                            class="mb-2 block text-sm font-semibold text-gray-700"
+                        >
+                            Profession
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profession"
+                            name="profession"
+                            value="{{ profil.profession }}"
+                            class="h-12 w-full rounded-xl border border-gray-300 px-4 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+                        >
+
+                    </div>
+
+
+                    <!-- BOUTON -->
+                    <div class="mt-8 flex justify-end">
+
+                        <button
+                            type="submit"
+                            class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-emerald-500/20"
+                        >
+                            <i data-lucide="save" class="h-4 w-4"></i>
+                            Enregistrer les modifications
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+    }
+
+});
+
+</script>
+
+{% endblock %}

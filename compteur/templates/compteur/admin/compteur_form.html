@@ -1,0 +1,905 @@
+{% extends "compteur/base.html" %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-8">
+
+    <!-- ========================================================
+         EN-TÊTE
+         ======================================================== -->
+
+    <div class="mb-8">
+
+        <!-- Retour -->
+        <a
+            href="{% url 'compteur:client_compteurs_admin' client.id %}"
+            class="inline-flex items-center gap-2
+                   text-gray-600 hover:text-gray-900
+                   font-medium mb-5
+                   transition"
+        >
+            <i
+                data-lucide="arrow-left"
+                class="w-5 h-5"
+            ></i>
+
+            Retour aux compteurs
+        </a>
+
+
+        <!-- Titre -->
+        <div class="flex items-start gap-4">
+
+            <div
+                class="w-12 h-12
+                       rounded-2xl
+                       bg-blue-100
+                       text-blue-600
+                       flex items-center justify-center
+                       flex-shrink-0"
+            >
+                <i
+                    data-lucide="{% if mode == 'modification' %}pencil{% else %}plus{% endif %}"
+                    class="w-6 h-6"
+                ></i>
+            </div>
+
+
+            <div>
+
+                <h1
+                    class="text-2xl md:text-3xl
+                           font-bold
+                           text-gray-900"
+                >
+                    {% if mode == "modification" %}
+                        Modifier le compteur
+                    {% else %}
+                        Ajouter un compteur
+                    {% endif %}
+                </h1>
+
+
+                <p class="mt-1 text-gray-500">
+
+                    Client :
+
+                    <span class="font-semibold text-gray-700">
+                        {{ client.prenom }} {{ client.nom }}
+                    </span>
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         INFORMATIONS DU COMPTEUR EN MODE MODIFICATION
+         ======================================================== -->
+
+    {% if mode == "modification" %}
+
+        <div
+            class="mb-6
+                   bg-blue-50
+                   border border-blue-100
+                   rounded-2xl
+                   p-5"
+        >
+
+            <div
+                class="flex
+                       flex-col
+                       sm:flex-row
+                       sm:items-center
+                       sm:justify-between
+                       gap-4"
+            >
+
+                <div>
+
+                    <p
+                        class="text-xs
+                               font-semibold
+                               uppercase
+                               tracking-wide
+                               text-blue-600"
+                    >
+                        Compteur actuellement modifié
+                    </p>
+
+
+                    <h2
+                        class="mt-1
+                               text-lg
+                               font-bold
+                               text-gray-900"
+                    >
+                        {{ compteur.nom }}
+                    </h2>
+
+
+                    <p
+                        class="text-sm
+                               text-gray-600
+                               font-mono
+                               mt-1"
+                    >
+                        {{ compteur.device_id }}
+                    </p>
+
+                </div>
+
+
+                <!-- État contacteur -->
+                <div>
+
+                    {% if compteur.contacteur %}
+
+                        <span
+                            class="inline-flex
+                                   items-center
+                                   gap-2
+                                   px-3
+                                   py-2
+                                   rounded-full
+                                   bg-green-100
+                                   text-green-700
+                                   text-sm
+                                   font-semibold"
+                        >
+                            <span
+                                class="w-2 h-2
+                                       rounded-full
+                                       bg-green-500"
+                            ></span>
+
+                            Contacteur ON
+                        </span>
+
+                    {% else %}
+
+                        <span
+                            class="inline-flex
+                                   items-center
+                                   gap-2
+                                   px-3
+                                   py-2
+                                   rounded-full
+                                   bg-red-100
+                                   text-red-700
+                                   text-sm
+                                   font-semibold"
+                        >
+                            <span
+                                class="w-2 h-2
+                                       rounded-full
+                                       bg-red-500"
+                            ></span>
+
+                            Contacteur OFF
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- ========================================================
+         CARTE PRINCIPALE
+         ======================================================== -->
+
+    <div
+        class="bg-white
+               rounded-2xl
+               shadow-sm
+               border border-gray-100
+               overflow-hidden"
+    >
+
+        <!-- En-tête carte -->
+        <div
+            class="px-6 py-5
+                   border-b border-gray-100
+                   bg-gray-50"
+        >
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="w-11 h-11
+                           rounded-xl
+                           bg-blue-100
+                           text-blue-600
+                           flex items-center justify-center"
+                >
+                    <i
+                        data-lucide="gauge"
+                        class="w-6 h-6"
+                    ></i>
+                </div>
+
+
+                <div>
+
+                    <h2
+                        class="text-lg
+                               font-bold
+                               text-gray-900"
+                    >
+                        Informations du compteur
+                    </h2>
+
+
+                    <p
+                        class="text-sm
+                               text-gray-500"
+                    >
+                        {% if mode == "modification" %}
+                            Modifiez les paramètres du compteur.
+                        {% else %}
+                            Configurez le nouveau compteur.
+                        {% endif %}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             FORMULAIRE
+             ==================================================== -->
+
+        <form
+            method="post"
+            class="p-6"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- =================================================
+                 ERREURS GÉNÉRALES
+                 ================================================= -->
+
+            {% if form.non_field_errors %}
+
+                <div
+                    class="mb-6
+                           p-4
+                           rounded-xl
+                           bg-red-50
+                           border border-red-200
+                           text-red-700"
+                >
+
+                    <div class="flex items-start gap-3">
+
+                        <i
+                            data-lucide="circle-alert"
+                            class="w-5 h-5 flex-shrink-0 mt-0.5"
+                        ></i>
+
+
+                        <div>
+
+                            <p
+                                class="font-semibold
+                                       mb-1"
+                            >
+                                Impossible d'enregistrer les modifications.
+                            </p>
+
+
+                            {% for error in form.non_field_errors %}
+
+                                <p class="text-sm">
+                                    {{ error }}
+                                </p>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 DEVICE ID
+                 ================================================= -->
+
+            <div class="mb-6">
+
+                <label
+                    for="{{ form.device_id.id_for_label }}"
+                    class="block
+                           text-sm
+                           font-semibold
+                           text-gray-700
+                           mb-2"
+                >
+                    {{ form.device_id.label }}
+                </label>
+
+
+                <div class="relative">
+
+                    <div
+                        class="absolute
+                               inset-y-0
+                               left-0
+                               pl-3
+                               flex
+                               items-center
+                               pointer-events-none
+                               text-gray-400"
+                    >
+                        <i
+                            data-lucide="cpu"
+                            class="w-5 h-5"
+                        ></i>
+                    </div>
+
+
+                    {{ form.device_id }}
+
+                </div>
+
+
+                <p
+                    class="mt-2
+                           text-xs
+                           text-gray-500"
+                >
+                    Identifiant unique utilisé par l'ESP32.
+                    Exemple : <strong>COMPTEUR_01</strong>
+                </p>
+
+
+                {% for error in form.device_id.errors %}
+
+                    <p
+                        class="mt-2
+                               text-sm
+                               text-red-600
+                               flex
+                               items-center
+                               gap-1"
+                    >
+                        <i
+                            data-lucide="circle-alert"
+                            class="w-4 h-4"
+                        ></i>
+
+                        {{ error }}
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =================================================
+                 NOM DU COMPTEUR
+                 ================================================= -->
+
+            <div class="mb-6">
+
+                <label
+                    for="{{ form.nom.id_for_label }}"
+                    class="block
+                           text-sm
+                           font-semibold
+                           text-gray-700
+                           mb-2"
+                >
+                    {{ form.nom.label }}
+                </label>
+
+
+                {{ form.nom }}
+
+
+                <p
+                    class="mt-2
+                           text-xs
+                           text-gray-500"
+                >
+                    Nom permettant d'identifier facilement le compteur.
+                    Exemple : <strong>Compteur Maison</strong>
+                </p>
+
+
+                {% for error in form.nom.errors %}
+
+                    <p
+                        class="mt-2
+                               text-sm
+                               text-red-600
+                               flex
+                               items-center
+                               gap-1"
+                    >
+                        <i
+                            data-lucide="circle-alert"
+                            class="w-4 h-4"
+                        ></i>
+
+                        {{ error }}
+
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =================================================
+                 SOLDE
+                 ================================================= -->
+
+            <div class="mb-8">
+
+                <label
+                    for="{{ form.solde.id_for_label }}"
+                    class="block
+                           text-sm
+                           font-semibold
+                           text-gray-700
+                           mb-2"
+                >
+                    {{ form.solde.label }}
+                </label>
+
+
+                <div class="relative">
+
+                    {{ form.solde }}
+
+
+                    <div
+                        class="absolute
+                               inset-y-0
+                               right-0
+                               flex
+                               items-center
+                               pr-4
+                               pointer-events-none
+                               text-sm
+                               font-semibold
+                               text-gray-400"
+                    >
+                        kWh
+                    </div>
+
+                </div>
+
+
+                <p
+                    class="mt-2
+                           text-xs
+                           text-gray-500"
+                >
+                    Quantité d'énergie disponible sur le compteur.
+                </p>
+
+
+                {% for error in form.solde.errors %}
+
+                    <p
+                        class="mt-2
+                               text-sm
+                               text-red-600
+                               flex
+                               items-center
+                               gap-1"
+                    >
+                        <i
+                            data-lucide="circle-alert"
+                            class="w-4 h-4"
+                        ></i>
+
+                        {{ error }}
+
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =================================================
+                 OPTIONS
+                 ================================================= -->
+
+            <div class="mb-8">
+
+                <div class="mb-4">
+
+                    <h3
+                        class="text-base
+                               font-bold
+                               text-gray-900"
+                    >
+                        État du compteur
+                    </h3>
+
+
+                    <p
+                        class="text-sm
+                               text-gray-500"
+                    >
+                        Configurez l'autorisation et le contacteur.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="grid
+                           grid-cols-1
+                           md:grid-cols-2
+                           gap-4"
+                >
+
+                    <!-- =========================================
+                         AUTORISATION
+                         ========================================= -->
+
+                    <label
+                        class="flex
+                               items-start
+                               gap-3
+                               p-4
+                               rounded-xl
+                               border border-gray-200
+                               hover:bg-gray-50
+                               cursor-pointer
+                               transition"
+                    >
+
+                        {{ form.autorisation }}
+
+
+                        <div>
+
+                            <span
+                                class="block
+                                       font-semibold
+                                       text-gray-800"
+                            >
+                                Autorisation
+                            </span>
+
+
+                            <span
+                                class="block
+                                       text-sm
+                                       text-gray-500
+                                       mt-1"
+                            >
+                                Autoriser le compteur à fonctionner.
+                            </span>
+
+                        </div>
+
+                    </label>
+
+
+                    <!-- =========================================
+                         CONTACTEUR
+                         ========================================= -->
+
+                    <label
+                        class="flex
+                               items-start
+                               gap-3
+                               p-4
+                               rounded-xl
+                               border border-gray-200
+                               hover:bg-gray-50
+                               cursor-pointer
+                               transition"
+                    >
+
+                        {{ form.contacteur }}
+
+
+                        <div>
+
+                            <span
+                                class="block
+                                       font-semibold
+                                       text-gray-800"
+                            >
+                                Contacteur
+                            </span>
+
+
+                            <span
+                                class="block
+                                       text-sm
+                                       text-gray-500
+                                       mt-1"
+                            >
+                                Définir l'état du contacteur.
+                            </span>
+
+                        </div>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RÉSUMÉ EN MODE MODIFICATION
+                 ================================================= -->
+
+            {% if mode == "modification" %}
+
+                <div
+                    class="mb-8
+                           p-4
+                           rounded-xl
+                           bg-gray-50
+                           border border-gray-200"
+                >
+
+                    <div class="flex items-start gap-3">
+
+                        <i
+                            data-lucide="info"
+                            class="w-5 h-5
+                                   text-blue-600
+                                   flex-shrink-0
+                                   mt-0.5"
+                        ></i>
+
+
+                        <div>
+
+                            <p
+                                class="font-semibold
+                                       text-gray-800"
+                            >
+                                Attention
+                            </p>
+
+
+                            <p
+                                class="text-sm
+                                       text-gray-600
+                                       mt-1"
+                            >
+                                Les modifications seront appliquées
+                                immédiatement au compteur enregistré.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 BOUTONS
+                 ================================================= -->
+
+            <div
+                class="flex
+                       flex-col-reverse
+                       sm:flex-row
+                       gap-3
+                       justify-end
+                       pt-6
+                       border-t border-gray-100"
+            >
+
+                <!-- Annuler -->
+                <a
+                    href="{% url 'compteur:client_compteurs_admin' client.id %}"
+                    class="inline-flex
+                           items-center
+                           justify-center
+                           gap-2
+                           px-5
+                           py-3
+                           rounded-xl
+                           border border-gray-300
+                           bg-white
+                           text-gray-700
+                           font-semibold
+                           hover:bg-gray-50
+                           transition"
+                >
+
+                    <i
+                        data-lucide="x"
+                        class="w-5 h-5"
+                    ></i>
+
+                    Annuler
+
+                </a>
+
+
+                <!-- Enregistrer -->
+                <button
+                    type="submit"
+                    class="inline-flex
+                           items-center
+                           justify-center
+                           gap-2
+                           px-5
+                           py-3
+                           rounded-xl
+                           bg-blue-600
+                           hover:bg-blue-700
+                           text-white
+                           font-semibold
+                           shadow-sm
+                           hover:shadow
+                           transition"
+                >
+
+                    <i
+                        data-lucide="save"
+                        class="w-5 h-5"
+                    ></i>
+
+
+                    {% if mode == "modification" %}
+                        Enregistrer les modifications
+                    {% else %}
+                        Créer le compteur
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     STYLE DES CHAMPS DJANGO
+     ============================================================ -->
+
+<style>
+
+    /* ----------------------------------------------------------
+       Champs texte et numérique
+       ---------------------------------------------------------- */
+
+    input[type="text"],
+    input[type="number"] {
+
+        width: 100%;
+
+        padding: 0.75rem 1rem;
+
+        border: 1px solid #d1d5db;
+
+        border-radius: 0.75rem;
+
+        background-color: #ffffff;
+
+        color: #111827;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+
+    }
+
+
+    /* ----------------------------------------------------------
+       Focus
+       ---------------------------------------------------------- */
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+
+        border-color: #2563eb;
+
+        box-shadow:
+            0 0 0 3px
+            rgba(37, 99, 235, 0.10);
+
+    }
+
+
+    /* ----------------------------------------------------------
+       Erreur Django
+       ---------------------------------------------------------- */
+
+    input[aria-invalid="true"] {
+
+        border-color: #ef4444;
+
+    }
+
+
+    /* ----------------------------------------------------------
+       Cases à cocher
+       ---------------------------------------------------------- */
+
+    input[type="checkbox"] {
+
+        width: 1.25rem;
+
+        height: 1.25rem;
+
+        accent-color: #2563eb;
+
+        cursor: pointer;
+
+        flex-shrink: 0;
+
+        margin-top: 0.1rem;
+
+    }
+
+
+    /* ----------------------------------------------------------
+       Responsive
+       ---------------------------------------------------------- */
+
+    @media (max-width: 640px) {
+
+        input[type="text"],
+        input[type="number"] {
+
+            padding: 0.7rem 0.9rem;
+
+        }
+
+    }
+
+</style>
+
+
+<!-- ============================================================
+     INITIALISATION LUCIDE
+     ============================================================ -->
+
+<script>
+
+    if (typeof lucide !== "undefined") {
+
+        lucide.createIcons();
+
+    }
+
+</script>
+
+{% endblock %}

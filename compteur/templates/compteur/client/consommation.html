@@ -1,0 +1,295 @@
+{% extends "compteur/base.html" %}
+
+{% block title %}
+Consommation - Gestion Électricité
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- ==========================================================
+         EN-TÊTE
+    =========================================================== -->
+
+    <div>
+
+        <p class="text-sm text-slate-500">
+            Suivi de votre énergie
+        </p>
+
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">
+            Consommation
+        </h2>
+
+        <p class="text-slate-500 mt-1">
+            Visualisez l'évolution de votre consommation et de votre puissance.
+        </p>
+
+        <p
+            id="tempsReelStatut"
+            class="text-xs text-slate-400 mt-2"
+        >
+            ● Actualisation automatique...
+        </p>
+
+    </div>
+
+
+    <!-- ==========================================================
+         COMPTEURS
+    =========================================================== -->
+
+    {% if donnees %}
+
+        {% for item in donnees %}
+
+        <div
+            class="compteur-consommation
+                   bg-white rounded-xl shadow-sm
+                   border border-slate-200
+                   overflow-hidden"
+
+            data-device-id="{{ item.compteur.device_id }}"
+
+            data-labels="{{ item.labels|join:',' }}"
+
+            data-energies="{{ item.energies|join:',' }}"
+
+            data-puissances="{{ item.puissances|join:',' }}"
+        >
+
+            <!-- ==================================================
+                 EN-TÊTE DU COMPTEUR
+            =================================================== -->
+
+            <div class="p-6 border-b border-slate-200">
+
+                <div
+                    class="flex flex-col md:flex-row
+                           md:items-center md:justify-between
+                           gap-4"
+                >
+
+                    <div>
+
+                        <h3 class="text-xl font-bold text-slate-900">
+                            {{ item.compteur.nom }}
+                        </h3>
+
+                        <p class="text-sm text-slate-500 mt-1">
+
+                            Device ID :
+
+                            <span class="font-semibold">
+                                {{ item.compteur.device_id }}
+                            </span>
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- SOLDE -->
+
+                    <div class="text-left md:text-right">
+
+                        <p class="text-sm text-slate-500">
+                            Solde actuel
+                        </p>
+
+                        <p class="text-2xl font-bold text-blue-600">
+
+                            <span class="compteur-solde-live">
+                                {{ item.compteur.solde }}
+                            </span>
+
+                            kWh
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 GRAPHIQUE
+            =================================================== -->
+
+            <div class="p-4 md:p-6">
+
+                {% if item.labels %}
+
+                    <div
+                        class="relative w-full"
+                        style="height: 320px;"
+                    >
+
+                        <canvas
+                            class="graphique-consommation"
+                        ></canvas>
+
+                    </div>
+
+                {% else %}
+
+                    <!-- AUCUNE DONNÉE -->
+
+                    <div class="py-16 text-center">
+
+                        <div class="text-5xl mb-4">
+                            📊
+                        </div>
+
+                        <h4 class="text-lg font-semibold text-slate-700">
+                            Aucune donnée disponible
+                        </h4>
+
+                        <p class="text-sm text-slate-500 mt-2">
+                            Les mesures PZEM apparaîtront ici.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <!-- ======================================================
+             AUCUN COMPTEUR
+        ======================================================= -->
+
+        <div
+            class="bg-white rounded-xl shadow-sm
+                   border border-slate-200"
+        >
+
+            <div class="py-20 text-center px-6">
+
+                <div class="text-5xl mb-4">
+                    ⚡
+                </div>
+
+                <h3 class="text-xl font-bold text-slate-900">
+                    Aucun compteur
+                </h3>
+
+                <p class="text-slate-500 mt-2">
+                    Aucun compteur électrique
+                    n'est encore associé à votre compte.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ==============================================================
+     DEBUG TEMPORAIRE
+================================================================ -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("=================================");
+    console.log("===== DEBUG CONSOMMATION =====");
+    console.log("=================================");
+
+
+    /*
+     * Vérifier Chart.js
+     */
+
+    console.log(
+        "Chart.js :",
+        typeof Chart
+    );
+
+
+    /*
+     * Chercher les canvas
+     */
+
+    const canvas = document.querySelectorAll(
+        ".graphique-consommation"
+    );
+
+
+    console.log(
+        "Canvas consommation :",
+        canvas.length
+    );
+
+
+    /*
+     * Afficher les données HTML
+     */
+
+    document
+        .querySelectorAll(".compteur-consommation")
+        .forEach(function (bloc, index) {
+
+            console.log(
+                "----- COMPTEUR " + index + " -----"
+            );
+
+            console.log(
+                "Device ID :",
+                bloc.dataset.deviceId
+            );
+
+            console.log(
+                "Labels :",
+                bloc.dataset.labels
+            );
+
+            console.log(
+                "Énergies :",
+                bloc.dataset.energies
+            );
+
+            console.log(
+                "Puissances :",
+                bloc.dataset.puissances
+            );
+
+        });
+
+
+    /*
+     * Vérifier chaque canvas
+     */
+
+    canvas.forEach(function (element, index) {
+
+        console.log(
+            "Canvas " + index + " :",
+            element
+        );
+
+        console.log(
+            "Parent :",
+            element.parentElement
+        );
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,926 @@
+{% extends "compteur/base.html" %}
+
+{% block title %}
+Dashboard Administrateur
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- ========================================================= -->
+    <!-- EN-TÊTE -->
+    <!-- ========================================================= -->
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div>
+
+            <h1 class="text-3xl font-bold text-slate-900">
+                Dashboard Administrateur
+            </h1>
+
+            <p class="text-slate-500 mt-1">
+                Supervision des clients, compteurs et équipements.
+            </p>
+
+        </div>
+
+
+        <!-- ÉTAT GÉNÉRAL -->
+
+        <div
+            class="inline-flex items-center gap-2 bg-white border border-slate-200
+                   rounded-xl px-4 py-2 shadow-sm w-fit"
+        >
+
+            <span
+                class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"
+            ></span>
+
+            <span class="text-sm font-medium text-slate-700">
+                Système actif
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- STATISTIQUES PRINCIPALES -->
+    <!-- ========================================================= -->
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+        <!-- CLIENTS -->
+
+        <div
+            class="bg-white rounded-2xl border border-slate-100 shadow-sm
+                   p-5 hover:shadow-md transition"
+        >
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        Clients
+                    </p>
+
+                    <p
+                        id="adminNombreClients"
+                        class="text-3xl font-bold text-slate-900 mt-2"
+                    >
+                        {{ nombre_clients }}
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="w-11 h-11 rounded-xl bg-blue-50
+                           flex items-center justify-center text-blue-600"
+                >
+                    <i data-lucide="users"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPTEURS -->
+
+        <div
+            class="bg-white rounded-2xl border border-slate-100 shadow-sm
+                   p-5 hover:shadow-md transition"
+        >
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        Compteurs
+                    </p>
+
+                    <p
+                        id="adminNombreCompteurs"
+                        class="text-3xl font-bold text-slate-900 mt-2"
+                    >
+                        {{ nombre_compteurs }}
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="w-11 h-11 rounded-xl bg-purple-50
+                           flex items-center justify-center text-purple-600"
+                >
+                    <i data-lucide="gauge"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ESP32 -->
+
+        <div
+            class="bg-white rounded-2xl border border-slate-100 shadow-sm
+                   p-5 hover:shadow-md transition"
+        >
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        ESP32 connectés
+                    </p>
+
+                    <p
+                        id="adminCompteursConnectes"
+                        class="text-3xl font-bold text-green-600 mt-2"
+                    >
+                        {{ compteurs_connectes }}
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="w-11 h-11 rounded-xl bg-green-50
+                           flex items-center justify-center text-green-600"
+                >
+                    <i data-lucide="wifi"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COUPÉS -->
+
+        <div
+            class="bg-white rounded-2xl border border-slate-100 shadow-sm
+                   p-5 hover:shadow-md transition"
+        >
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        Compteurs coupés
+                    </p>
+
+                    <p
+                        id="adminCompteursCoupes"
+                        class="text-3xl font-bold text-red-600 mt-2"
+                    >
+                        {{ compteurs_coupes }}
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="w-11 h-11 rounded-xl bg-red-50
+                           flex items-center justify-center text-red-600"
+                >
+                    <i data-lucide="power-off"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- BILAN ÉNERGÉTIQUE -->
+    <!-- ========================================================= -->
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <!-- SOLDE -->
+
+        <div
+            class="bg-gradient-to-br from-blue-600 to-blue-700
+                   rounded-2xl shadow-sm p-6 text-white"
+        >
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <p class="text-blue-100 text-sm">
+                        Solde énergétique total
+                    </p>
+
+                    <p class="text-4xl font-bold mt-3">
+
+                        <span id="adminSoldeTotal">
+                            {{ solde_total }}
+                        </span>
+
+                        <span class="text-lg font-normal text-blue-100">
+                            kWh
+                        </span>
+
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="w-12 h-12 rounded-xl bg-white/15
+                           flex items-center justify-center"
+                >
+                    <i data-lucide="battery-charging"></i>
+                </div>
+
+            </div>
+
+
+            <p class="text-sm text-blue-100 mt-4">
+                Total disponible sur l'ensemble des compteurs.
+            </p>
+
+        </div>
+
+
+        <!-- CONSOMMATION -->
+
+        <div
+            class="bg-white rounded-2xl border border-slate-100
+                   shadow-sm p-6"
+        >
+
+            <div class="flex items-start justify-between">
+
+                <div>
+
+                    <p class="text-slate-500 text-sm">
+                        Consommation totale
+                    </p>
+
+                    <p class="text-4xl font-bold text-slate-900 mt-3">
+
+                        <span id="adminConsommationTotale">
+                            {{ consommation_totale }}
+                        </span>
+
+                        <span class="text-lg font-normal text-slate-500">
+                            kWh
+                        </span>
+
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="w-12 h-12 rounded-xl bg-orange-50
+                           flex items-center justify-center text-orange-600"
+                >
+                    <i data-lucide="zap"></i>
+                </div>
+
+            </div>
+
+
+            <p class="text-sm text-slate-500 mt-4">
+                Consommation cumulée enregistrée par les compteurs.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ÉTAT TEMPS RÉEL -->
+    <!-- ========================================================= -->
+
+    <div
+        id="adminTempsReelStatut"
+        class="bg-white rounded-2xl border border-slate-100
+               shadow-sm px-5 py-4"
+    >
+
+        <div class="flex flex-col sm:flex-row sm:items-center
+                    sm:justify-between gap-3">
+
+            <div class="flex items-center gap-3">
+
+                <span
+                    id="adminTempsReelIndicateur"
+                    class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"
+                ></span>
+
+                <div>
+
+                    <p class="text-sm font-semibold text-slate-800">
+                        Supervision temps réel
+                    </p>
+
+                    <p
+                        id="adminTempsReelTexte"
+                        class="text-xs text-green-600 mt-0.5"
+                    >
+                        Connexion au serveur...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="adminDerniereActualisation"
+                class="text-xs text-slate-500"
+            >
+                En attente des données...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- COMPTEURS -->
+    <!-- ========================================================= -->
+
+    <div
+        class="bg-white rounded-2xl border border-slate-100
+               shadow-sm overflow-hidden"
+    >
+
+        <!-- EN-TÊTE -->
+
+        <div
+            class="p-5 md:p-6 border-b border-slate-100
+                   flex flex-col sm:flex-row sm:items-center
+                   sm:justify-between gap-3"
+        >
+
+            <div>
+
+                <h2 class="text-xl font-bold text-slate-900">
+                    Derniers compteurs
+                </h2>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    État actuel des compteurs enregistrés.
+                </p>
+
+            </div>
+
+
+            <div
+                class="inline-flex items-center gap-2 text-sm
+                       text-slate-500"
+            >
+
+                <i
+                    data-lucide="refresh-cw"
+                    class="w-4 h-4"
+                ></i>
+
+                <span>
+                    Actualisation automatique
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full min-w-[760px]">
+
+                <thead class="bg-slate-50">
+
+                    <tr>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Device
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Client
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Solde
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            ESP32
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Contacteur
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="adminCompteursTableBody"
+                    class="divide-y divide-slate-100"
+                >
+
+                    {% for compteur in derniers_compteurs %}
+
+                    <tr
+                        class="admin-compteur-row hover:bg-slate-50 transition"
+                        data-device-id="{{ compteur.device_id }}"
+                    >
+
+                        <!-- DEVICE -->
+
+                        <td class="px-5 py-4">
+
+                            <div class="flex items-center gap-3">
+
+                                <div
+                                    class="w-9 h-9 rounded-lg bg-slate-100
+                                           flex items-center justify-center
+                                           text-slate-600"
+                                >
+
+                                    <i
+                                        data-lucide="cpu"
+                                        class="w-4 h-4"
+                                    ></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p class="font-semibold text-slate-900">
+                                        {{ compteur.device_id }}
+                                    </p>
+
+                                    {% if compteur.nom %}
+
+                                    <p class="text-xs text-slate-500">
+                                        {{ compteur.nom }}
+                                    </p>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- CLIENT -->
+
+                        <td class="px-5 py-4">
+
+                            <div class="flex items-center gap-2">
+
+                                <div
+                                    class="w-8 h-8 rounded-full bg-blue-50
+                                           flex items-center justify-center
+                                           text-blue-600"
+                                >
+
+                                    <i
+                                        data-lucide="user"
+                                        class="w-4 h-4"
+                                    ></i>
+
+                                </div>
+
+
+                                <span class="text-slate-700">
+                                    {{ compteur.utilisateur.username }}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- SOLDE -->
+
+                        <td class="px-5 py-4">
+
+                            <span
+                                class="admin-compteur-solde font-semibold text-slate-900"
+                            >
+                                {{ compteur.solde }}
+                            </span>
+
+                            <span class="text-sm text-slate-500">
+                                kWh
+                            </span>
+
+                        </td>
+
+
+                        <!-- ESP32 -->
+
+                        <td class="px-5 py-4">
+
+                            {% if compteur.esp32_connecte %}
+
+                            <span
+                                class="admin-compteur-esp32
+                                       inline-flex items-center gap-1.5
+                                       px-2.5 py-1 rounded-full
+                                       text-xs font-medium
+                                       bg-green-50 text-green-700
+                                       whitespace-nowrap"
+                            >
+
+                                <span
+                                    class="admin-compteur-esp32-point
+                                           w-1.5 h-1.5 rounded-full
+                                           bg-green-500"
+                                ></span>
+
+                                <span class="admin-compteur-esp32-texte">
+                                    Connecté
+                                </span>
+
+                            </span>
+
+                            {% else %}
+
+                            <span
+                                class="admin-compteur-esp32
+                                       inline-flex items-center gap-1.5
+                                       px-2.5 py-1 rounded-full
+                                       text-xs font-medium
+                                       bg-red-50 text-red-700
+                                       whitespace-nowrap"
+                            >
+
+                                <span
+                                    class="admin-compteur-esp32-point
+                                           w-1.5 h-1.5 rounded-full
+                                           bg-red-500"
+                                ></span>
+
+                                <span class="admin-compteur-esp32-texte">
+                                    Déconnecté
+                                </span>
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CONTACTEUR -->
+
+                        <td class="px-5 py-4">
+
+                            {% if compteur.contacteur %}
+
+                            <span
+                                class="admin-compteur-contacteur
+                                       inline-flex items-center gap-1.5
+                                       px-2.5 py-1 rounded-full
+                                       text-xs font-semibold
+                                       bg-green-50 text-green-700"
+                            >
+
+                                <i
+                                    data-lucide="power"
+                                    class="w-3.5 h-3.5"
+                                ></i>
+
+                                <span>
+                                    ON
+                                </span>
+
+                            </span>
+
+                            {% else %}
+
+                            <span
+                                class="admin-compteur-contacteur
+                                       inline-flex items-center gap-1.5
+                                       px-2.5 py-1 rounded-full
+                                       text-xs font-semibold
+                                       bg-red-50 text-red-700"
+                            >
+
+                                <i
+                                    data-lucide="power-off"
+                                    class="w-3.5 h-3.5"
+                                ></i>
+
+                                <span>
+                                    OFF
+                                </span>
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="p-10 text-center text-slate-500"
+                        >
+
+                            <div
+                                class="flex flex-col items-center
+                                       justify-center"
+                            >
+
+                                <i
+                                    data-lucide="gauge"
+                                    class="w-10 h-10 text-slate-300 mb-3"
+                                ></i>
+
+                                <p class="font-medium">
+                                    Aucun compteur enregistré.
+                                </p>
+
+                                <p class="text-sm mt-1">
+                                    Les compteurs apparaîtront ici.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- HISTORIQUE DES COMMANDES -->
+    <!-- ========================================================= -->
+
+    <div
+        class="bg-white rounded-2xl border border-slate-100
+               shadow-sm overflow-hidden"
+    >
+
+        <div
+            class="p-5 md:p-6 border-b border-slate-100
+                   flex items-center justify-between"
+        >
+
+            <div>
+
+                <h2 class="text-xl font-bold text-slate-900">
+                    Dernières commandes
+                </h2>
+
+                <p class="text-sm text-slate-500 mt-1">
+                    Les dernières actions ON/OFF enregistrées.
+                </p>
+
+            </div>
+
+
+            <div
+                class="w-10 h-10 rounded-xl bg-slate-100
+                       flex items-center justify-center text-slate-600"
+            >
+
+                <i data-lucide="history"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full min-w-[700px]">
+
+                <thead class="bg-slate-50">
+
+                    <tr>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Compteur
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Action
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Motif
+                        </th>
+
+                        <th
+                            class="text-left px-5 py-4 text-xs
+                                   font-semibold uppercase tracking-wide
+                                   text-slate-500"
+                        >
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody class="divide-y divide-slate-100">
+
+                    {% for commande in dernieres_commandes %}
+
+                    <tr class="hover:bg-slate-50 transition">
+
+                        <td class="px-5 py-4 font-medium text-slate-700">
+                            {{ commande.compteur.device_id }}
+                        </td>
+
+
+                        <td class="px-5 py-4">
+
+                            {% if commande.action == "ON" %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5
+                                       px-2.5 py-1 rounded-full
+                                       text-xs font-semibold
+                                       bg-green-50 text-green-700"
+                            >
+
+                                <i
+                                    data-lucide="power"
+                                    class="w-3.5 h-3.5"
+                                ></i>
+
+                                ON
+
+                            </span>
+
+                            {% else %}
+
+                            <span
+                                class="inline-flex items-center gap-1.5
+                                       px-2.5 py-1 rounded-full
+                                       text-xs font-semibold
+                                       bg-red-50 text-red-700"
+                            >
+
+                                <i
+                                    data-lucide="power-off"
+                                    class="w-3.5 h-3.5"
+                                ></i>
+
+                                OFF
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td class="px-5 py-4 text-slate-600">
+                            {{ commande.motif|default:"-" }}
+                        </td>
+
+
+                        <td class="px-5 py-4 text-slate-500 whitespace-nowrap">
+                            {{ commande.date_action|date:"d/m/Y H:i" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="p-10 text-center text-slate-500"
+                        >
+
+                            <div
+                                class="flex flex-col items-center
+                                       justify-center"
+                            >
+
+                                <i
+                                    data-lucide="history"
+                                    class="w-10 h-10 text-slate-300 mb-3"
+                                ></i>
+
+                                <p class="font-medium">
+                                    Aucune commande enregistrée.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- LUCIDE -->
+<!-- ========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        if (
+            typeof lucide !== "undefined"
+        ) {
+
+            lucide.createIcons();
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}
